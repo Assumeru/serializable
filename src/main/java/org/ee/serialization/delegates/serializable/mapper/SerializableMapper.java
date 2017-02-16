@@ -1,11 +1,8 @@
 package org.ee.serialization.delegates.serializable.mapper;
 
 import java.io.IOException;
-import java.io.ObjectStreamClass;
 import java.io.ObjectStreamConstants;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -14,19 +11,26 @@ import org.ee.serialization.SerializationException;
 import org.ee.serialization.delegates.serializable.mapper.model.ClassDescription;
 import org.ee.serialization.delegates.serializable.mapper.model.FieldValue;
 import org.ee.serialization.delegates.serializable.mapper.model.ObjectMapping;
+import org.ee.serialization.delegates.serializable.mapper.platform.AndroidConstructor;
+import org.ee.serialization.delegates.serializable.mapper.platform.JreConstructor;
+import org.ee.serialization.delegates.serializable.mapper.platform.NativeConstructor;
+import org.ee.serialization.delegates.serializable.mapper.platform.ReflectionConstuctor;
 
 public class SerializableMapper implements ObjectInputStreamMapperDelegate {
 	private static final int STATIC_FINAL = Modifier.STATIC | Modifier.FINAL;
-	private static final Map<ClassDescription, Constructor<?>> CONSTRUCTOR_CACHE = new WeakHashMap<>();
-	private static final Method GET_SERIALIZABLE_CONSTRUCTOR;
+	private static final NativeConstructor NATIVE_CONSTRUCTOR;
 	static {
-		Method method = null;
+		NativeConstructor constructor;
 		try {
-			method = ObjectStreamClass.class.getDeclaredMethod("getSerializableConstructor", Class.class);
-			method.setAccessible(true);
-		} catch (Exception e) {
+			constructor = new JreConstructor();
+		} catch(UnsupportedOperationException e) {
+			try {
+				constructor = new AndroidConstructor();
+			} catch(UnsupportedOperationException e2) {
+				constructor = new ReflectionConstuctor();
+			}
 		}
-		GET_SERIALIZABLE_CONSTRUCTOR = method;
+		NATIVE_CONSTRUCTOR = constructor;
 	}
 	private final Map<ClassDescription, Boolean> mappable;
 
@@ -57,24 +61,8 @@ public class SerializableMapper implements ObjectInputStreamMapperDelegate {
 	}
 
 	static Object newInstance(ClassDescription description, Map<ClassDescription, Boolean> mappable) throws ReflectiveOperationException, SerializationException {
-		Constructor<?> constructor = CONSTRUCTOR_CACHE.get(description);
 		try {
-			if(constructor == null) {
-				Class<?> type = Class.forName(description.getName());
-				try {
-					constructor = type.getDeclaredConstructor();
-					constructor.setAccessible(true);
-				} catch(NoSuchMethodException e) {
-					if(GET_SERIALIZABLE_CONSTRUCTOR == null) {
-						throw new SerializationException("Failed to invoke constructor", e);
-					}
-					constructor = (Constructor<?>) GET_SERIALIZABLE_CONSTRUCTOR.invoke(null, type);
-				}
-				if(constructor == null) {
-					throw new SerializationException("Failed to invoke constructor");
-				}
-			}
-			return constructor.newInstance();
+			return NATIVE_CONSTRUCTOR.newInstance(description);
 		} catch(SerializationException | ReflectiveOperationException | IllegalArgumentException e) {
 			mappable.put(description, false);
 			throw e;
