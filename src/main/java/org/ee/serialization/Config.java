@@ -33,6 +33,5 @@ public class Config {
 	}
 
 	public static class Key<E> {
-		
 	}
 }
