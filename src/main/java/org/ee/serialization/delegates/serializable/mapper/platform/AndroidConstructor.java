@@ -19,8 +19,11 @@ public class AndroidConstructor implements NativeConstructor {
 	public AndroidConstructor() {
 		try {
 			newInstance = ObjectStreamClass.class.getDeclaredMethod("newInstance", Class.class);
+			newInstance.setAccessible(true);
 			setFlags = ObjectStreamClass.class.getDeclaredMethod("setFlags", byte.class);
+			setFlags.setAccessible(true);
 			setClass = ObjectStreamClass.class.getDeclaredMethod("setClass", Class.class);
+			setClass.setAccessible(true);
 			constructor = ObjectStreamClass.class.getDeclaredConstructor();
 			constructor.setAccessible(true);
 		} catch (NoSuchMethodException | SecurityException e) {
