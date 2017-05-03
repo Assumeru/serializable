@@ -3,8 +3,8 @@ package org.ee.serialization;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ee.serialization.delegates.DelegateFactory;
-import org.ee.serialization.delegates.DelegateManager;
+import org.ee.serialization.deserialization.DelegateFactory;
+import org.ee.serialization.deserialization.DelegateManager;
 
 public class Config {
 	private final Map<Key<?>, Object> factorySettings = new HashMap<>();
@@ -32,6 +32,6 @@ public class Config {
 		return this;
 	}
 
-	public static class Key<E> {
+	public static final class Key<E> {
 	}
 }

@@ -4,7 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.ee.serialization.delegates.DeserializationDelegate;
+import org.ee.serialization.deserialization.DeserializationDelegate;
 
 public class Deserializer implements Closeable {
 	private final DeserializationDelegate input;

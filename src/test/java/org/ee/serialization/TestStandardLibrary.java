@@ -12,8 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.ee.serialization.delegates.serializable.ObjectInputStreamDelegateFactory;
-import org.ee.serialization.delegates.serializable.mapper.DefaultObjectInputStreamMapper;
+import org.ee.serialization.deserialization.serializable.ObjectInputStreamDelegateFactory;
+import org.ee.serialization.deserialization.serializable.mapper.DefaultObjectInputStreamMapper;
 import org.junit.Assert;
 import org.junit.Test;
 
