@@ -1,94 +1,34 @@
 package org.ee.serialization.serialization.json.output;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.apache.commons.codec.binary.Base64;
+import org.ee.serialization.Config;
 import org.ee.serialization.SerializationException;
 import org.ee.serialization.serialization.CachingSerializer;
-import org.ee.serialization.serialization.ClassDescriptor;
 import org.ee.serialization.serialization.json.JsonSerializable;
+import org.ee.serialization.serialization.json.mapper.JsonMapper;
 import org.ee.serialization.serialization.json.output.writer.JsonWriter;
 
 public class DefaultJsonDataOutputStream extends CachingSerializer implements JsonDataOutputStream {
 	private final JsonWriter output;
-	private final boolean addVersion;
-	private final Map<Class<?>, ClassDescriptor> descriptors;
+	private final Config config;
+	private final JsonMapper mapper;
 
-	public DefaultJsonDataOutputStream(JsonWriter output, boolean addVersion) throws IOException {
+	public DefaultJsonDataOutputStream(JsonWriter output, Config config, JsonMapper mapper) throws IOException {
 		this.output = output;
-		this.addVersion = addVersion;
-		descriptors = new HashMap<>();
+		this.config = config;
+		this.mapper = mapper;
 	}
 
 	@Override
 	protected void writeObjectOrReference(Object object) throws IOException {
-		if(object == null) {
-			value((String) null);
-		} else if(object.getClass() == byte[].class) {
-			value(Base64.encodeBase64String((byte[]) object));
-		} else if(object.getClass().isArray()) {
-			beginObject();
-			name(PROPERTY_CLASS).value(object.getClass().getName());
-			name(PROPERTY_ARRAY_VALUES).beginArray();
-			for(int i = 0; i < Array.getLength(object); i++) {
-				writeObject(Array.get(object, i));
-			}
-			endArray();
-			endObject();
-		} else if(object.getClass() == String.class) {
-			value((String) object);
-		} else if(object.getClass() == Boolean.class) {
-			value((Boolean) object);
-		} else if(object instanceof Number) {
-			value((Number) object);
-		} else if(object instanceof JsonSerializable) {
+		if(object instanceof JsonSerializable) {
 			((JsonSerializable) object).toJson(this);
-		} else if(object instanceof Enum) {
-			Enum<?> e = (Enum<?>) object;
-			beginObject();
-			name(PROPERTY_CLASS).value(object.getClass().getName());
-			name(PROPERTY_ENUM_VALUE).value(e.name());
-			endObject();
+		} else if(mapper.canMap(object)) {
+			mapper.map(object, this);
 		} else {
-			try {
-				ClassDescriptor descriptor = getClassDescriptor(object.getClass());
-				beginObject();
-				name(PROPERTY_CLASS).value(descriptor.getName());
-				if(addVersion && descriptor.getSerialVersion() != null) {
-					name(PROPERTY_VERSION).value(descriptor.getSerialVersion());
-				}
-				name(PROPERTY_FIELDS).beginObject();
-				for(Field field : descriptor.getFields()) {
-					Object value = field.get(object);
-					if(value != null) {
-						Class<?> declaringClass = field.getDeclaringClass();
-						if(declaringClass != object.getClass()) {
-							name(field.getDeclaringClass().getName() + "." + field.getName());
-						} else {
-							name(field.getName());
-						}
-						writeObject(value);
-					}
-				}
-				endObject();
-				endObject();
-			} catch(IllegalAccessException e) {
-				throw new SerializationException("Failed to serialize object with " + object.getClass(), e);
-			}
+			throw new SerializationException("Could not map " + object);
 		}
-	}
-
-	private ClassDescriptor getClassDescriptor(Class<?> type) throws SerializationException {
-		ClassDescriptor descriptor = descriptors.get(type);
-		if(descriptor == null) {
-			descriptor = ClassDescriptor.of(type);
-			descriptors.put(type, descriptor);
-		}
-		return descriptor;
 	}
 
 	@Override
@@ -166,5 +106,10 @@ public class DefaultJsonDataOutputStream extends CachingSerializer implements Js
 	public JsonDataOutputStream value(long value) throws IOException {
 		output.value(value);
 		return this;
+	}
+
+	@Override
+	public Config getConfig() {
+		return config;
 	}
 }

@@ -5,6 +5,8 @@ import java.io.OutputStream;
 
 import org.ee.serialization.Config;
 import org.ee.serialization.Config.Key;
+import org.ee.serialization.serialization.json.mapper.JsonMapper;
+import org.ee.serialization.serialization.json.mapper.standard.DefaultMapper;
 import org.ee.serialization.serialization.json.output.writer.GsonWriter;
 import org.ee.serialization.serialization.json.output.writer.JsonWriter;
 import org.ee.serialization.serialization.json.output.writer.JsonWriterFactory;
@@ -12,8 +14,8 @@ import org.ee.serialization.serialization.json.output.writer.JsonWriterFactory;
 public class DefaultJsonDataOutputStreamFactory implements JsonDataOutputStreamFactory {
 	public static final DefaultJsonDataOutputStreamFactory INSTANCE = new DefaultJsonDataOutputStreamFactory();
 	public static final Key<JsonWriterFactory> WRITER_FACTORY = new Key<>();
-	public static final Key<Boolean> ADD_VERSION = new Key<>();
 	public static final Key<Boolean> PRETTY_PRINT = new Key<>();
+	public static final Key<JsonMapper> JSON_MAPPER = new Key<>();
 
 	@Override
 	public JsonDataOutputStream createJsonDataOutputStream(OutputStream output, Config config) throws IOException {
@@ -26,7 +28,11 @@ public class DefaultJsonDataOutputStreamFactory implements JsonDataOutputStreamF
 			writer = new GsonWriter(output);
 			((GsonWriter) writer).setPrettyPrint(getBoolean(config.getFactorySetting(PRETTY_PRINT)));
 		}
-		return new DefaultJsonDataOutputStream(writer, getBoolean(config.getFactorySetting(ADD_VERSION)));
+		JsonMapper mapper = config.getFactorySetting(JSON_MAPPER);
+		if(mapper == null) {
+			mapper = DefaultMapper.INSTANCE;
+		}
+		return new DefaultJsonDataOutputStream(writer, config, mapper);
 	}
 
 	private boolean getBoolean(Boolean value) {

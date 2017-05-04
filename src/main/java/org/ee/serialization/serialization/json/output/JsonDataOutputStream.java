@@ -2,6 +2,7 @@ package org.ee.serialization.serialization.json.output;
 
 import java.io.IOException;
 
+import org.ee.serialization.Config;
 import org.ee.serialization.Serializer;
 import org.ee.serialization.serialization.json.output.writer.JsonWriter;
 
@@ -48,4 +49,6 @@ public interface JsonDataOutputStream extends Serializer, JsonWriter {
 
 	@Override
 	JsonDataOutputStream value(String value) throws IOException;
+
+	Config getConfig();
 }
