@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.ee.serialization.Config;
 import org.ee.serialization.SerializationException;
 import org.ee.serialization.serialization.CachingSerializer;
+import org.ee.serialization.serialization.ObjectFilter;
 import org.ee.serialization.serialization.json.JsonSerializable;
 import org.ee.serialization.serialization.json.mapper.JsonMapper;
 import org.ee.serialization.serialization.json.output.writer.JsonWriter;
@@ -13,15 +14,20 @@ public class DefaultJsonDataOutputStream extends CachingSerializer implements Js
 	private final JsonWriter output;
 	private final Config config;
 	private final JsonMapper mapper;
+	private final ObjectFilter filter;
 
-	public DefaultJsonDataOutputStream(JsonWriter output, Config config, JsonMapper mapper) throws IOException {
+	public DefaultJsonDataOutputStream(JsonWriter output, Config config, JsonMapper mapper, ObjectFilter filter) throws IOException {
 		this.output = output;
 		this.config = config;
 		this.mapper = mapper;
+		this.filter = filter;
 	}
 
 	@Override
 	protected void writeObjectOrReference(Object object) throws IOException {
+		if(filter != null) {
+			object = filter.filter(object, config);
+		}
 		if(object instanceof JsonSerializable) {
 			((JsonSerializable) object).toJson(this);
 		} else if(mapper.canMap(object)) {

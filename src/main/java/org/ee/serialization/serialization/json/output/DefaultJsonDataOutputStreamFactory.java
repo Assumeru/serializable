@@ -5,6 +5,7 @@ import java.io.OutputStream;
 
 import org.ee.serialization.Config;
 import org.ee.serialization.Config.Key;
+import org.ee.serialization.serialization.ObjectFilter;
 import org.ee.serialization.serialization.json.mapper.JsonMapper;
 import org.ee.serialization.serialization.json.mapper.standard.DefaultMapper;
 import org.ee.serialization.serialization.json.output.writer.GsonWriter;
@@ -16,6 +17,7 @@ public class DefaultJsonDataOutputStreamFactory implements JsonDataOutputStreamF
 	public static final Key<JsonWriterFactory> WRITER_FACTORY = new Key<>();
 	public static final Key<Boolean> PRETTY_PRINT = new Key<>();
 	public static final Key<JsonMapper> JSON_MAPPER = new Key<>();
+	public static final Key<ObjectFilter> OBJECT_FILTER = new Key<>();
 
 	@Override
 	public JsonDataOutputStream createJsonDataOutputStream(OutputStream output, Config config) throws IOException {
@@ -32,7 +34,7 @@ public class DefaultJsonDataOutputStreamFactory implements JsonDataOutputStreamF
 		if(mapper == null) {
 			mapper = DefaultMapper.INSTANCE;
 		}
-		return new DefaultJsonDataOutputStream(writer, config, mapper);
+		return new DefaultJsonDataOutputStream(writer, config, mapper, config.getFactorySetting(OBJECT_FILTER));
 	}
 
 	private boolean getBoolean(Boolean value) {
