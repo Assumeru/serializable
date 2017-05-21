@@ -19,8 +19,8 @@ import org.junit.Test;
 
 public class TestStandardLibrary {
 	static final Config CONFIG = new Config()
-			.setFactorySetting(ObjectInputStreamDelegateFactory.USE_NATIVE, false)
-			.setFactorySetting(ObjectInputStreamDelegateFactory.MAPPER, new DefaultObjectInputStreamMapper());
+			.set(ObjectInputStreamDelegateFactory.USE_NATIVE, false)
+			.set(ObjectInputStreamDelegateFactory.MAPPER, new DefaultObjectInputStreamMapper());
 
 	@Test
 	public void testArrays() throws IOException, ClassNotFoundException {

@@ -7,13 +7,12 @@ import org.ee.serialization.deserialization.serializable.ObjectInputStreamDelega
 import org.ee.serialization.objects.ComplexObject;
 import org.ee.serialization.objects.SimpleObject;
 import org.ee.serialization.serialization.json.JsonSerializer;
-import org.ee.serialization.serialization.json.output.DefaultJsonDataOutputStreamFactory;
 import org.junit.Test;
 
 public class TestJsonOutput {
 	static final Config CONFIG = new Config()
-			.setFactorySetting(ObjectInputStreamDelegateFactory.USE_NATIVE, false)
-			.setFactorySetting(DefaultJsonDataOutputStreamFactory.PRETTY_PRINT, true);
+			.set(ObjectInputStreamDelegateFactory.USE_NATIVE, false)
+			.set(JsonSerializer.PRETTY_PRINT, true);
 	static final OutputStream STDOUT = new GuardedOutputStream(System.out);
 	private final SimpleObject o1;
 	private final SimpleObject o2;

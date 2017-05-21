@@ -5,21 +5,41 @@ import java.io.OutputStream;
 
 import org.ee.serialization.Config;
 import org.ee.serialization.Config.Key;
-import org.ee.serialization.serialization.json.output.DefaultJsonDataOutputStreamFactory;
-import org.ee.serialization.serialization.json.output.JsonDataOutputStream;
-import org.ee.serialization.serialization.json.output.JsonDataOutputStreamFactory;
 import org.ee.serialization.Serializer;
+import org.ee.serialization.serialization.ObjectFilter;
+import org.ee.serialization.serialization.json.mapper.JsonMapper;
+import org.ee.serialization.serialization.json.mapper.standard.DefaultMapper;
+import org.ee.serialization.serialization.json.output.JsonDataOutputStream;
+import org.ee.serialization.serialization.json.output.writer.GsonWriter;
+import org.ee.serialization.serialization.json.output.writer.JsonWriter;
+import org.ee.serialization.serialization.json.output.writer.JsonWriterFactory;
 
 public class JsonSerializer implements Serializer {
-	private static final Key<JsonDataOutputStreamFactory> STREAM_FACTORY = new Key<>();
+	public static final Key<JsonWriterFactory> WRITER_FACTORY = new Key<>();
+	public static final Key<Boolean> PRETTY_PRINT = new Key<>();
+	public static final Key<JsonMapper> JSON_MAPPER = new Key<>();
+	public static final Key<ObjectFilter> OBJECT_FILTER = new Key<>();
 	private final JsonDataOutputStream output;
 
 	public JsonSerializer(OutputStream output, Config config) throws IOException {
-		JsonDataOutputStreamFactory factory = config.getFactorySetting(STREAM_FACTORY);
-		if(factory == null) {
-			factory = DefaultJsonDataOutputStreamFactory.INSTANCE;
+		JsonWriterFactory factory = config.get(WRITER_FACTORY);
+		JsonWriter writer = null;
+		if(factory != null) {
+			writer = factory.createWriter(output, config);
 		}
-		this.output = factory.createJsonDataOutputStream(output, config);
+		if(writer == null) {
+			writer = new GsonWriter(output);
+			((GsonWriter) writer).setPrettyPrint(getBoolean(config.get(PRETTY_PRINT)));
+		}
+		JsonMapper mapper = config.get(JSON_MAPPER);
+		if(mapper == null) {
+			mapper = DefaultMapper.INSTANCE;
+		}
+		this.output = new JsonDataOutputStream(writer, config, mapper, config.get(OBJECT_FILTER));
+	}
+
+	private boolean getBoolean(Boolean value) {
+		return value == null ? false : value;
 	}
 
 	@Override

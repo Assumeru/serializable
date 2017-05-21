@@ -25,7 +25,7 @@ public class ObjectMapper implements JsonMapper {
 			output.value((String) null);
 			return;
 		}
-		Boolean addVersion = output.getConfig().getFactorySetting(ADD_VERSION);
+		Boolean addVersion = output.getConfig().get(ADD_VERSION);
 		if(addVersion == null) {
 			addVersion = false;
 		}
