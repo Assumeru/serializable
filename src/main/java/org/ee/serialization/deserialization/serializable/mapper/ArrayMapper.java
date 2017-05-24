@@ -20,7 +20,7 @@ public class ArrayMapper implements ObjectInputStreamMapperDelegate {
 	public Object map(Object object, ObjectInputStreamMapper mapper) throws IOException, ClassNotFoundException {
 		if(object instanceof ArrayMapping) {
 			ArrayMapping mapping = (ArrayMapping) object;
-			Class<?> type = Class.forName(mapping.getDescription().getName());
+			Class<?> type = mapping.getDescription().getType();
 			Object out = Array.newInstance(type.getComponentType(), mapping.size());
 			for(int i = 0; i < mapping.size(); i++) {
 				Array.set(out, i, mapper.map(mapping.get(i), mapper));

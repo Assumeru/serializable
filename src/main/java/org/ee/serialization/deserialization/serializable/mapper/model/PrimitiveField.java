@@ -5,6 +5,10 @@ public class PrimitiveField extends Field {
 		super(description, typeCode, name);
 	}
 
+	public PrimitiveField(ClassDescription description, char typeCode, String name, java.lang.reflect.Field field) {
+		super(description, typeCode, name, field);
+	}
+
 	public static boolean isPrimitive(char typeCode) {
 		switch(typeCode) {
 		case 'B':

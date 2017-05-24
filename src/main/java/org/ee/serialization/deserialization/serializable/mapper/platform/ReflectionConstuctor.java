@@ -14,7 +14,7 @@ public class ReflectionConstuctor implements NativeConstructor {
 	public Object newInstance(ClassDescription description) throws SerializationException, ReflectiveOperationException, IllegalArgumentException {
 		Constructor<?> constructor = cache.get(description);
 		if(constructor == null) {
-			Class<?> type = Class.forName(description.getName());
+			Class<?> type = description.getType();
 			try {
 				constructor = type.getDeclaredConstructor();
 				constructor.setAccessible(true);

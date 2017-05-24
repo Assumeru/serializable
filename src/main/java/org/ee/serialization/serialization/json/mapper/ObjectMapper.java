@@ -1,4 +1,4 @@
-package org.ee.serialization.serialization.json.mapper.standard;
+package org.ee.serialization.serialization.json.mapper;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -8,7 +8,6 @@ import java.util.Map;
 import org.ee.serialization.SerializationException;
 import org.ee.serialization.Config.Key;
 import org.ee.serialization.serialization.ClassDescriptor;
-import org.ee.serialization.serialization.json.mapper.JsonMapper;
 import org.ee.serialization.serialization.json.output.JsonDataOutputStream;
 
 public class ObjectMapper implements JsonMapper {

@@ -38,7 +38,7 @@ public class AndroidConstructor implements NativeConstructor {
 		if(objectStreamClass == null) {
 			objectStreamClass = constructor.newInstance();
 			setFlags.invoke(objectStreamClass, description.getInfo().getFlags());
-			setClass.invoke(objectStreamClass, Class.forName(description.getName()));
+			setClass.invoke(objectStreamClass, description.getType());
 			cache.put(description, objectStreamClass);
 		}
 		return newInstance.invoke(objectStreamClass, objectStreamClass.forClass());

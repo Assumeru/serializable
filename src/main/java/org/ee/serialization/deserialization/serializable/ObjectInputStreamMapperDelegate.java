@@ -74,6 +74,7 @@ public class ObjectInputStreamMapperDelegate implements DeserializationDelegate 
 		case ObjectStreamConstants.TC_CLASS:
 			return readNewClass();
 		case ObjectStreamConstants.TC_CLASSDESC:
+		case ObjectStreamConstants.TC_PROXYCLASSDESC:
 			return readNewClassDescription();
 		case ObjectStreamConstants.TC_ENUM:
 			return readNewEnum();
@@ -130,6 +131,7 @@ public class ObjectInputStreamMapperDelegate implements DeserializationDelegate 
 		int next = input.peek();
 		switch(next) {
 		case ObjectStreamConstants.TC_CLASSDESC:
+		case ObjectStreamConstants.TC_PROXYCLASSDESC:
 			return readNewClassDescription();
 		case ObjectStreamConstants.TC_NULL:
 			readNullReference();

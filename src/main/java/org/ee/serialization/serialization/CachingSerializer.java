@@ -15,7 +15,7 @@ public abstract class CachingSerializer implements Serializer {
 
 	@Override
 	public void writeObject(Object object) throws IOException {
-		if(object != null && object.getClass() != Boolean.class && object.getClass() != String.class && !(object instanceof Number)) {
+		if(shouldCache(object)) {
 			Reference ref = references.get(object);
 			if(ref != null) {
 				object = ref;
@@ -27,4 +27,8 @@ public abstract class CachingSerializer implements Serializer {
 	}
 
 	protected abstract void writeObjectOrReference(Object object) throws IOException;
+
+	protected boolean shouldCache(Object object) {
+		return object != null && object.getClass() != Boolean.class && object.getClass() != String.class && !(object instanceof Number);
+	}
 }

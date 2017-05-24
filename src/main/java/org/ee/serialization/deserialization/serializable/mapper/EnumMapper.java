@@ -21,7 +21,7 @@ public class EnumMapper implements ObjectInputStreamMapperDelegate {
 	public Object map(Object object, ObjectInputStreamMapper mapper) throws IOException, ClassNotFoundException {
 		if(object instanceof EnumMapping) {
 			EnumMapping mapping = (EnumMapping) object;
-			Class type = Class.forName(mapping.getDescription().getName());
+			Class type = mapping.getDescription().getType();
 			try {
 				return Enum.valueOf(type, mapping.getName());
 			} catch(IllegalArgumentException e) {

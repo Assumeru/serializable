@@ -6,6 +6,7 @@ public class ClassDescription {
 	private final String name;
 	private final long suid;
 	private ClassDescriptionInfo info;
+	private Class<?> type;
 
 	public ClassDescription(String name, long suid) {
 		this.name = name;
@@ -28,6 +29,13 @@ public class ClassDescription {
 
 	public ClassDescriptionInfo getInfo() {
 		return info;
+	}
+
+	public Class<?> getType() throws ClassNotFoundException {
+		if(type == null) {
+			type = Class.forName(name);
+		}
+		return type;
 	}
 
 	@Override

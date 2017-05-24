@@ -45,10 +45,7 @@ public class SerializableMapper implements ObjectInputStreamMapperDelegate {
 			try {
 				Object out = newInstance(mapping.getDescription(), mappable);
 				for(FieldValue value : mapping.getFields()) {
-					Class<?> fieldClass = Class.forName(value.getField().getDescription().getName());
-					Field field = fieldClass.getDeclaredField(value.getField().getName());
-					field.setAccessible(true);
-					field.set(out, mapper.map(value.getValue(), mapper));
+					value.getField().getField().set(out, mapper.map(value.getValue(), mapper));
 				}
 				return out;
 			} catch(ClassNotFoundException e) {
@@ -90,7 +87,7 @@ public class SerializableMapper implements ObjectInputStreamMapperDelegate {
 
 	static boolean classExists(ClassDescription description) {
 		try {
-			Class<?> type = Class.forName(description.getName());
+			Class<?> type = description.getType();
 			if(type.isArray()) {
 				return true;
 			}

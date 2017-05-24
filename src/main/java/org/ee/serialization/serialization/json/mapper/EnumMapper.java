@@ -1,8 +1,7 @@
-package org.ee.serialization.serialization.json.mapper.standard;
+package org.ee.serialization.serialization.json.mapper;
 
 import java.io.IOException;
 
-import org.ee.serialization.serialization.json.mapper.JsonMapper;
 import org.ee.serialization.serialization.json.output.JsonDataOutputStream;
 
 public class EnumMapper implements JsonMapper {

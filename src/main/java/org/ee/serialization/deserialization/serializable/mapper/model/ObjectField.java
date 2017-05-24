@@ -8,6 +8,11 @@ public class ObjectField extends Field {
 		this.className = className;
 	}
 
+	public ObjectField(ClassDescription description, char typeCode, String name, String className, java.lang.reflect.Field field) {
+		super(description, typeCode, name, field);
+		this.className = className;
+	}
+
 	public String getClassName() {
 		return className;
 	}

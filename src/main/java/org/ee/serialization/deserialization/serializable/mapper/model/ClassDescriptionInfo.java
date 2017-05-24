@@ -1,6 +1,7 @@
 package org.ee.serialization.deserialization.serializable.mapper.model;
 
 import java.io.IOException;
+import java.io.ObjectOutput;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,6 +39,42 @@ public class ClassDescriptionInfo {
 	void readFieldValues(ObjectInputStreamMapperDelegate input, List<FieldValue> fieldValues) throws IOException {
 		for(Field field : fields) {
 			fieldValues.add(new FieldValue(field, input.readType(field.getTypeCode())));
+		}
+	}
+
+	public void writeFieldValues(ObjectOutput output, Object object) throws NoSuchFieldException, SecurityException, ClassNotFoundException, IllegalAccessException, IOException {
+		for(Field field : fields) {
+			java.lang.reflect.Field f = field.getField();
+			switch(field.getTypeCode()) {
+			case 'B':
+				output.writeByte(f.getByte(object));
+				break;
+			case 'C':
+				output.writeChar(f.getChar(object));
+				break;
+			case 'D':
+				output.writeDouble(f.getDouble(object));
+				break;
+			case 'F':
+				output.writeFloat(f.getFloat(object));
+				break;
+			case 'I':
+				output.writeInt(f.getInt(object));
+				break;
+			case 'J':
+				output.writeLong(f.getLong(object));
+				break;
+			case 'S':
+				output.writeShort(f.getShort(object));
+				break;
+			case 'Z':
+				output.writeBoolean(f.getBoolean(object));
+				break;
+			case 'L':
+			case '[':
+				output.writeObject(f.get(object));
+				break;
+			}
 		}
 	}
 
