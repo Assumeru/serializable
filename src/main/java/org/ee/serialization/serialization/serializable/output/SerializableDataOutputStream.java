@@ -1,11 +1,14 @@
 package org.ee.serialization.serialization.serializable.output;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectStreamConstants;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 import org.ee.serialization.Config;
 import org.ee.serialization.SerializationException;
@@ -15,16 +18,19 @@ import org.ee.serialization.serialization.ObjectFilter;
 import org.ee.serialization.serialization.serializable.mapper.SerializableMapper;
 
 public class SerializableDataOutputStream extends CachingSerializer implements Serializer, ObjectOutput {
+	private static final int MAX_POOL_SIZE = 5;
 	private final Config config;
 	private final DataOutputStream output;
 	private final SerializableMapper mapper;
 	private final ObjectFilter filter;
+	private final Deque<WeakReference<StreamBuffer>> bufferPool;
 
 	public SerializableDataOutputStream(OutputStream output, Config config, SerializableMapper mapper, ObjectFilter filter) throws IOException {
 		this.output = output instanceof DataOutputStream ? (DataOutputStream) output : new DataOutputStream(output);
 		this.config = config;
 		this.mapper = mapper;
 		this.filter = filter;
+		bufferPool = new LinkedList<>();
 		writeShort(ObjectStreamConstants.STREAM_MAGIC);
 		writeShort(ObjectStreamConstants.STREAM_VERSION);
 	}
@@ -130,7 +136,35 @@ public class SerializableDataOutputStream extends CachingSerializer implements S
 		output.flush();
 	}
 
-	public void write(ByteArrayOutputStream buffer) throws IOException {
+	public StreamBuffer getStreamBuffer() {
+		StreamBuffer buffer = null;
+		for(Iterator<WeakReference<StreamBuffer>> it = bufferPool.iterator(); buffer == null && it.hasNext();) {
+			WeakReference<StreamBuffer> ref = it.next();
+			buffer = ref.get();
+			it.remove();
+		}
+		if(buffer == null) {
+			buffer = new StreamBuffer(this);
+		}
+		buffer.open();
+		return buffer;
+	}
+
+	void returnBuffer(StreamBuffer buffer) throws IOException {
 		buffer.writeTo(output);
+		boolean add = bufferPool.size() < MAX_POOL_SIZE;
+		if(!add) {
+			for(Iterator<WeakReference<StreamBuffer>> it = bufferPool.iterator(); it.hasNext();) {
+				WeakReference<StreamBuffer> ref = it.next();
+				if(ref.get() == null) {
+					it.remove();
+					add = true;
+				}
+			}
+		}
+		if(add) {
+			buffer.reset();
+			bufferPool.add(new WeakReference<>(buffer));
+		}
 	}
 }

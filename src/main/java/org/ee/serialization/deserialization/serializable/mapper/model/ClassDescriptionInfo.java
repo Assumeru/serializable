@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.ee.serialization.deserialization.serializable.ObjectInputStreamMapperDelegate;
 
-public class ClassDescriptionInfo {
+public class ClassDescriptionInfo implements ObjectOutputWriteable {
 	private final byte flags;
 	private final Field[] fields;
 	private final List<Object> annotation;
@@ -76,6 +76,17 @@ public class ClassDescriptionInfo {
 				break;
 			}
 		}
+	}
+
+	@Override
+	public void writeTo(ObjectOutput output) throws IOException {
+		output.writeByte(flags);
+		output.writeShort(fields.length);
+		for(Field field : fields) {
+			field.writeTo(output);
+		}
+		ObjectMapping.writeBlockData(output, annotation);
+		output.writeObject(superClass);
 	}
 
 	@Override

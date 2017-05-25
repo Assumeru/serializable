@@ -1,5 +1,8 @@
 package org.ee.serialization.deserialization.serializable.mapper.model;
 
+import java.io.IOException;
+import java.io.ObjectOutput;
+
 public class ObjectField extends Field {
 	private final String className;
 
@@ -19,6 +22,12 @@ public class ObjectField extends Field {
 
 	public static boolean isObject(char typeCode) {
 		return typeCode == '[' || typeCode == 'L';
+	}
+
+	@Override
+	public void writeTo(ObjectOutput output) throws IOException {
+		super.writeTo(output);
+		output.writeObject(className);
 	}
 
 	@Override

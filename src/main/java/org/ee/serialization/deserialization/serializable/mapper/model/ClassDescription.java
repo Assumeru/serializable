@@ -1,8 +1,11 @@
 package org.ee.serialization.deserialization.serializable.mapper.model;
 
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectStreamConstants;
 import java.util.Objects;
 
-public class ClassDescription {
+public class ClassDescription implements ObjectOutputWriteable {
 	private final String name;
 	private final long suid;
 	private ClassDescriptionInfo info;
@@ -57,5 +60,13 @@ public class ClassDescription {
 	@Override
 	public int hashCode() {
 		return (int) (suid ^ (suid >>> 32)) + Objects.hashCode(name);
+	}
+
+	@Override
+	public void writeTo(ObjectOutput output) throws IOException {
+		output.writeByte(ObjectStreamConstants.TC_CLASSDESC);
+		output.writeUTF(name);
+		output.writeLong(suid);
+		getInfo().writeTo(output);
 	}
 }

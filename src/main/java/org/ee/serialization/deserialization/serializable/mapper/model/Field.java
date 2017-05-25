@@ -1,6 +1,9 @@
 package org.ee.serialization.deserialization.serializable.mapper.model;
 
-public abstract class Field {
+import java.io.IOException;
+import java.io.ObjectOutput;
+
+public abstract class Field implements ObjectOutputWriteable {
 	private static final Field[] NONE = {};
 	private final ClassDescription description;
 	private final char typeCode;
@@ -43,6 +46,12 @@ public abstract class Field {
 			field.setAccessible(true);
 		}
 		return field;
+	}
+
+	@Override
+	public void writeTo(ObjectOutput output) throws IOException {
+		output.writeByte(typeCode);
+		output.writeUTF(name);
 	}
 
 	@Override

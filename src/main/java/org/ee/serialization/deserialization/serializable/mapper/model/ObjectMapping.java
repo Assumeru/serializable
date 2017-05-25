@@ -2,6 +2,7 @@ package org.ee.serialization.deserialization.serializable.mapper.model;
 
 import java.io.IOException;
 import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.io.ObjectStreamConstants;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,8 +15,9 @@ import org.ee.serialization.deserialization.serializable.ObjectInputStreamMapper
 import org.ee.serialization.deserialization.serializable.mapper.ObjectInputStreamMapper;
 import org.ee.serialization.serialization.json.JsonSerializable;
 import org.ee.serialization.serialization.json.output.JsonDataOutputStream;
+import org.ee.serialization.serialization.serializable.ObjectOutputStreamSerializer;
 
-public class ObjectMapping implements JsonSerializable {
+public class ObjectMapping implements JsonSerializable, ObjectOutputWriteable {
 	private final ClassDescription description;
 	private List<FieldValue> fields;
 	private List<Object> data;
@@ -55,6 +57,7 @@ public class ObjectMapping implements JsonSerializable {
 				readClassData(current, input);
 			}
 		}
+		fields = Collections.unmodifiableList(fields);
 	}
 
 	private void readClassData(ClassDescription current, ObjectInputStreamMapperDelegate input) throws IOException {
@@ -117,5 +120,39 @@ public class ObjectMapping implements JsonSerializable {
 		}
 		output.endArray();
 		output.endObject();
+	}
+
+	@Override
+	public void writeTo(ObjectOutput output) throws IOException {
+		output.writeByte(ObjectStreamConstants.TC_OBJECT);
+		ClassDescription description = this.description;
+		output.writeObject(description);
+		boolean cont = true;
+		while(description != null && cont) {
+			cont = writeDescription(output, description);
+			description = description.getInfo().getSuperClass();
+		}
+	}
+
+	private boolean writeDescription(ObjectOutput output, ClassDescription description) throws IOException {
+		if(description.getInfo().hasFlag(ObjectStreamConstants.SC_EXTERNALIZABLE)) {
+			writeBlockData(output, data);
+			return false;
+		}
+		for(FieldValue field : fields) {
+			field.writeTo(output);
+		}
+		return true;
+	}
+
+	static void writeBlockData(ObjectOutput output, List<Object> data) throws IOException {
+		for(Object o : data) {
+			if(o.getClass() == byte[].class) {
+				ObjectOutputStreamSerializer.writeBlockData(output, (byte[]) o);
+			} else {
+				output.writeObject(o);
+			}
+		}
+		output.writeByte(ObjectStreamConstants.TC_ENDBLOCKDATA);
 	}
 }

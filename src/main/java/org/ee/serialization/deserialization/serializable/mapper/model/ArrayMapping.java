@@ -1,6 +1,8 @@
 package org.ee.serialization.deserialization.serializable.mapper.model;
 
 import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectStreamConstants;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -232,5 +234,16 @@ public class ArrayMapping extends ObjectMapping implements List<Object>, RandomA
 			output.writeObject(value);
 		}
 		output.endArray().endObject();
+	}
+
+	@Override
+	public void writeTo(ObjectOutput output) throws IOException {
+		output.writeByte(ObjectStreamConstants.TC_ARRAY);
+		getDescription().writeTo(output);
+		output.writeInt(values.length);
+		char type = getDescription().getName().charAt(1);
+		for(Object value : values) {
+			FieldValue.writeType(output, type, value);
+		}
 	}
 }

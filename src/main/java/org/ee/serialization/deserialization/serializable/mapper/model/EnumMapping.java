@@ -1,6 +1,8 @@
 package org.ee.serialization.deserialization.serializable.mapper.model;
 
 import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectStreamConstants;
 
 import org.ee.serialization.serialization.json.output.JsonDataOutputStream;
 
@@ -24,5 +26,12 @@ public class EnumMapping extends ObjectMapping {
 		output.name(JsonDataOutputStream.PROPERTY_VERSION).value(description.getSerialVersionUID());
 		output.name(JsonDataOutputStream.PROPERTY_ENUM_VALUE).value(name);
 		output.endObject();
+	}
+
+	@Override
+	public void writeTo(ObjectOutput output) throws IOException {
+		output.writeByte(ObjectStreamConstants.TC_ENUM);
+		getDescription().writeTo(output);
+		output.writeObject(name);
 	}
 }
