@@ -7,6 +7,7 @@ import org.ee.serialization.deserialization.serializable.ObjectInputStreamDelega
 import org.ee.serialization.objects.ComplexObject;
 import org.ee.serialization.objects.SimpleObject;
 import org.ee.serialization.serialization.json.JsonSerializer;
+import org.ee.serialization.util.GuardedOutputStream;
 import org.junit.Test;
 
 public class TestJsonOutput {

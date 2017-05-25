@@ -1,4 +1,4 @@
-package org.ee.serialization;
+package org.ee.serialization.util;
 
 import java.io.IOException;
 import java.io.OutputStream;

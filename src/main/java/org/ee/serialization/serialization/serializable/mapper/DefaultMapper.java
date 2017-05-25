@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 import org.ee.serialization.serialization.DelegatingMapper;
 import org.ee.serialization.serialization.serializable.mapper.standard.StandardMapper;
-import org.ee.serialization.serialization.serializable.output.SerializableDataOutputStream;
+import org.ee.serialization.serialization.serializable.output.ObjectOutputSerializer;
 
-public class DefaultMapper extends DelegatingMapper<SerializableDataOutputStream, SerializableMapper> implements SerializableMapper {
+public class DefaultMapper extends DelegatingMapper<ObjectOutputSerializer, SerializableMapper> implements SerializableMapper {
 	public static final DefaultMapper INSTANCE = new DefaultMapper();
 
 	public DefaultMapper() {

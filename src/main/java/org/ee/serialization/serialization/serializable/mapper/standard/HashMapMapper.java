@@ -2,34 +2,48 @@ package org.ee.serialization.serialization.serializable.mapper.standard;
 
 import java.io.IOException;
 import java.io.ObjectStreamConstants;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.ee.serialization.deserialization.serializable.mapper.model.ClassDescription;
+import org.ee.serialization.serialization.serializable.ObjectOutputStreamSerializer;
 import org.ee.serialization.serialization.serializable.mapper.ClassMapper;
 import org.ee.serialization.serialization.serializable.mapper.SerializableMapper;
 import org.ee.serialization.serialization.serializable.output.ObjectOutputSerializer;
+import org.ee.serialization.serialization.serializable.output.StreamBuffer;
 
-public class DateMapper implements SerializableMapper {
+public class HashMapMapper implements SerializableMapper {
 	private final ClassMapper mapper;
 
-	public DateMapper(ClassMapper mapper) {
+	public HashMapMapper(ClassMapper mapper) {
 		this.mapper = mapper;
 	}
 
 	@Override
 	public boolean canMap(Object object) {
-		return object instanceof Date;
+		return object instanceof HashMap;
 	}
 
 	@Override
 	public void map(Object object, ObjectOutputSerializer output) throws IOException {
-		Date date = (Date) object;
+		HashMap<?, ?> map = (HashMap<?, ?>) object;
 		output.writeByte(ObjectStreamConstants.TC_OBJECT);
 		ClassDescription description = mapper.getClassDescription(object.getClass());
 		output.writeObject(description);
-		output.writeByte(ObjectStreamConstants.TC_BLOCKDATA);
-		output.writeByte(8);
-		output.writeLong(date.getTime());
+		boolean cont = true;
+		while(description != null && cont) {
+			cont = mapper.writeDescription(object, output, description);
+			description = description.getInfo().getSuperClass();
+		}
+		try(StreamBuffer buffer = output.getStreamBuffer()) {
+			buffer.writeInt(map.size());
+			buffer.writeInt(map.size());
+			for(Map.Entry<?, ?> entry : map.entrySet()) {
+				buffer.writeObject(entry.getKey());
+				buffer.writeObject(entry.getValue());
+			}
+			ObjectOutputStreamSerializer.writeBlockDataHeader(output, buffer.size());
+		}
 		output.writeByte(ObjectStreamConstants.TC_ENDBLOCKDATA);
 	}
 }

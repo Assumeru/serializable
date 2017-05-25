@@ -14,7 +14,11 @@ public abstract class CachingSerializer implements Serializer {
 	}
 
 	@Override
-	public void writeObject(Object object) throws IOException {
+	public final void writeObject(Object object) throws IOException {
+		writeObjectOrReference(cache(object));
+	}
+
+	protected final Object cache(Object object) {
 		if(shouldCache(object)) {
 			Reference ref = references.get(object);
 			if(ref != null) {
@@ -23,7 +27,7 @@ public abstract class CachingSerializer implements Serializer {
 				references.put(object, new Reference(references.size()));
 			}
 		}
-		writeObjectOrReference(object);
+		return object;
 	}
 
 	protected abstract void writeObjectOrReference(Object object) throws IOException;

@@ -1,6 +1,5 @@
 package org.ee.serialization.serialization.serializable.mapper;
 
-import java.io.DataOutputStream;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectOutput;
@@ -24,7 +23,7 @@ import org.ee.serialization.deserialization.serializable.mapper.model.Field;
 import org.ee.serialization.deserialization.serializable.mapper.model.ObjectField;
 import org.ee.serialization.deserialization.serializable.mapper.model.PrimitiveField;
 import org.ee.serialization.serialization.serializable.ObjectOutputStreamSerializer;
-import org.ee.serialization.serialization.serializable.output.SerializableDataOutputStream;
+import org.ee.serialization.serialization.serializable.output.ObjectOutputSerializer;
 import org.ee.serialization.serialization.serializable.output.StreamBuffer;
 
 public class ClassMapper {
@@ -80,7 +79,8 @@ public class ClassMapper {
 		if(Externalizable.class.isAssignableFrom(type)) {
 			flags |= ObjectStreamConstants.SC_EXTERNALIZABLE;
 		}
-		flags |= ObjectStreamConstants.SC_BLOCK_DATA;
+		//TODO SC_BLOCK_DATA flag
+		//flags |= ObjectStreamConstants.SC_BLOCK_DATA;
 		if(Enum.class.isAssignableFrom(type)) {
 			flags |= ObjectStreamConstants.SC_ENUM;
 		}
@@ -97,7 +97,13 @@ public class ClassMapper {
 				if(fieldType.isPrimitive()) {
 					f = new PrimitiveField(description, Field.getTypeCode(fieldType), field.getName(), field);
 				} else {
-					f = new ObjectField(description, Field.getTypeCode(fieldType), field.getName(), fieldType.getName(), field);
+					String fieldDescriptor;
+					if(fieldType.isArray()) {
+						fieldDescriptor = fieldType.getName();
+					} else {
+						fieldDescriptor = new StringBuilder().append('L').append(fieldType.getName().replace('.', '/')).append(';').toString();
+					}
+					f = new ObjectField(description, Field.getTypeCode(fieldType), field.getName(), fieldDescriptor, field);
 				}
 				fields.add(f);
 			}
@@ -117,13 +123,13 @@ public class ClassMapper {
 		return 0;
 	}
 
-	public boolean writeDescription(Object object, SerializableDataOutputStream output, ClassDescription description) throws IOException {
+	public boolean writeDescription(Object object, ObjectOutputSerializer output, ClassDescription description) throws IOException {
 		if(description.getInfo().hasFlag(ObjectStreamConstants.SC_EXTERNALIZABLE)) {
 			if(WRITE_EXTERNAL == null) {
 				throw new SerializationException("Could not access Externalizable.writeExternal");
 			}
 			try(StreamBuffer buffer = output.getStreamBuffer()) {
-				WRITE_EXTERNAL.invoke(object, new DataOutputStream(buffer));
+				WRITE_EXTERNAL.invoke(object, buffer);
 				ObjectOutputStreamSerializer.writeBlockDataHeader(output, buffer.size());
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				throw new SerializationException(e);

@@ -20,6 +20,7 @@ public abstract class Field implements ObjectOutputWriteable {
 	public Field(ClassDescription description, char typeCode, String name, java.lang.reflect.Field field) {
 		this(description, typeCode, name);
 		this.field = field;
+		field.setAccessible(true);
 	}
 
 	public Field(ClassDescription description, char typeCode, String name) {

@@ -3,11 +3,11 @@ package org.ee.serialization.serialization.serializable.mapper;
 import java.io.IOException;
 import java.io.ObjectStreamConstants;
 
-import org.ee.serialization.serialization.serializable.output.SerializableDataOutputStream;
+import org.ee.serialization.serialization.serializable.output.ObjectOutputSerializer;
 
 public class PrimitiveMapper implements SerializableMapper {
 	@Override
-	public void map(Object object, SerializableDataOutputStream output) throws IOException {
+	public void map(Object object, ObjectOutputSerializer output) throws IOException {
 		if(object == null) {
 			output.writeByte(ObjectStreamConstants.TC_NULL);
 		} else if(object.getClass() == String.class) {

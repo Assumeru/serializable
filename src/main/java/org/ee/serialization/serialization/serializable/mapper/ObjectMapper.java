@@ -5,7 +5,7 @@ import java.io.ObjectStreamConstants;
 
 import org.ee.serialization.deserialization.serializable.mapper.model.ClassDescription;
 import org.ee.serialization.deserialization.serializable.mapper.model.ObjectOutputWriteable;
-import org.ee.serialization.serialization.serializable.output.SerializableDataOutputStream;
+import org.ee.serialization.serialization.serializable.output.ObjectOutputSerializer;
 
 public class ObjectMapper implements SerializableMapper {
 	private final ClassMapper mapper;
@@ -20,7 +20,7 @@ public class ObjectMapper implements SerializableMapper {
 	}
 
 	@Override
-	public void map(Object object, SerializableDataOutputStream output) throws IOException {
+	public void map(Object object, ObjectOutputSerializer output) throws IOException {
 		if(object instanceof ObjectOutputWriteable) {
 			((ObjectOutputWriteable) object).writeTo(output);
 		} else {
