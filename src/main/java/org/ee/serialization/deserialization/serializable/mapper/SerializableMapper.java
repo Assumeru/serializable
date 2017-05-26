@@ -88,7 +88,7 @@ public class SerializableMapper implements ObjectInputStreamMapperDelegate {
 	static boolean classExists(ClassDescription description) {
 		try {
 			Class<?> type = description.getType();
-			if(type.isArray()) {
+			if(type.isArray() || Enum.class.isAssignableFrom(type)) {
 				return true;
 			}
 			Long suid = getSerialVersionUID(type);

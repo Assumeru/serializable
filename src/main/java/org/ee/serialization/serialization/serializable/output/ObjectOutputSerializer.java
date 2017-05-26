@@ -1,12 +1,12 @@
 package org.ee.serialization.serialization.serializable.output;
 
 import java.io.IOException;
-import java.io.ObjectOutput;
 
 import org.ee.serialization.Config;
 import org.ee.serialization.Serializer;
+import org.ee.serialization.deserialization.serializable.mapper.model.CachingObjectOutput;
 
-public interface ObjectOutputSerializer extends Serializer, ObjectOutput {
+public interface ObjectOutputSerializer extends Serializer, CachingObjectOutput {
 	Config getConfig();
 
 	StreamBuffer getStreamBuffer();

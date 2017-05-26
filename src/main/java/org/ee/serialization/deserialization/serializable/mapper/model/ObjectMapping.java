@@ -2,7 +2,6 @@ package org.ee.serialization.deserialization.serializable.mapper.model;
 
 import java.io.IOException;
 import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.io.ObjectStreamConstants;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -123,10 +122,11 @@ public class ObjectMapping implements JsonSerializable, ObjectOutputWriteable {
 	}
 
 	@Override
-	public void writeTo(ObjectOutput output) throws IOException {
+	public void writeTo(CachingObjectOutput output) throws IOException {
 		output.writeByte(ObjectStreamConstants.TC_OBJECT);
 		ClassDescription description = this.description;
 		output.writeObject(description);
+		output.assignHandle(this);
 		boolean cont = true;
 		while(description != null && cont) {
 			cont = writeDescription(output, description);
@@ -134,7 +134,7 @@ public class ObjectMapping implements JsonSerializable, ObjectOutputWriteable {
 		}
 	}
 
-	private boolean writeDescription(ObjectOutput output, ClassDescription description) throws IOException {
+	private boolean writeDescription(CachingObjectOutput output, ClassDescription description) throws IOException {
 		if(description.getInfo().hasFlag(ObjectStreamConstants.SC_EXTERNALIZABLE)) {
 			writeBlockData(output, data);
 			return false;
@@ -142,12 +142,16 @@ public class ObjectMapping implements JsonSerializable, ObjectOutputWriteable {
 		for(FieldValue field : fields) {
 			field.writeTo(output);
 		}
+		//TODO
+		if(this.description == description && description.getInfo().hasFlag(ObjectStreamConstants.SC_WRITE_METHOD)) {
+			writeBlockData(output, data);
+		}
 		return true;
 	}
 
-	static void writeBlockData(ObjectOutput output, List<Object> data) throws IOException {
+	static void writeBlockData(CachingObjectOutput output, List<Object> data) throws IOException {
 		for(Object o : data) {
-			if(o.getClass() == byte[].class) {
+			if(o != null && o.getClass() == byte[].class) {
 				ObjectOutputStreamSerializer.writeBlockData(output, (byte[]) o);
 			} else {
 				output.writeObject(o);

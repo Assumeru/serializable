@@ -33,7 +33,12 @@ public class StreamBuffer extends DataOutputStream implements ObjectOutputSerial
 
 	@Override
 	public void writeObject(Object object, ObjectOutputSerializer serializer) throws IOException {
-		serializer.writeObject(object, serializer);
+		this.serializer.writeObject(object, serializer);
+	}
+
+	@Override
+	public void assignHandle(Object object) {
+		serializer.assignHandle(object);
 	}
 
 	@Override

@@ -1,7 +1,6 @@
 package org.ee.serialization.deserialization.serializable.mapper.model;
 
 import java.io.IOException;
-import java.io.ObjectOutput;
 import java.io.ObjectStreamConstants;
 import java.util.Objects;
 
@@ -63,10 +62,11 @@ public class ClassDescription implements ObjectOutputWriteable {
 	}
 
 	@Override
-	public void writeTo(ObjectOutput output) throws IOException {
+	public void writeTo(CachingObjectOutput output) throws IOException {
 		output.writeByte(ObjectStreamConstants.TC_CLASSDESC);
 		output.writeUTF(name);
 		output.writeLong(suid);
+		output.assignHandle(this);
 		getInfo().writeTo(output);
 	}
 }

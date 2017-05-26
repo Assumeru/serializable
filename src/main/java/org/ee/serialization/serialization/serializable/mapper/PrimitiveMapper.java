@@ -12,6 +12,7 @@ public class PrimitiveMapper implements SerializableMapper {
 			output.writeByte(ObjectStreamConstants.TC_NULL);
 		} else if(object.getClass() == String.class) {
 			String string = (String) object;
+			output.assignHandle(object);
 			if(string.length() > 0xFFFF) {
 				output.write(ObjectStreamConstants.TC_LONGSTRING);
 				//TODO potentially incorrect

@@ -19,6 +19,7 @@ public class SerializableDataOutputStream extends CachingSerializer implements O
 	private final StreamBufferPool pool;
 
 	public SerializableDataOutputStream(OutputStream output, Config config, SerializableMapper mapper, ObjectFilter filter) throws IOException {
+		super(false);
 		this.output = output instanceof DataOutputStream ? (DataOutputStream) output : new DataOutputStream(output);
 		this.config = config;
 		this.mapper = mapper;
@@ -30,7 +31,7 @@ public class SerializableDataOutputStream extends CachingSerializer implements O
 
 	@Override
 	public void writeObject(Object object, ObjectOutputSerializer serializer) throws IOException {
-		writeObjectOrReference(cache(object), serializer);
+		writeObjectOrReference(getFromCache(object), serializer);
 	}
 
 	@Override
@@ -52,6 +53,11 @@ public class SerializableDataOutputStream extends CachingSerializer implements O
 	@Override
 	protected boolean shouldCache(Object object) {
 		return object != null && (object.getClass() == String.class || super.shouldCache(object));
+	}
+
+	@Override
+	public void assignHandle(Object object) {
+		addToCache(object);
 	}
 
 	@Override

@@ -79,7 +79,7 @@ public class ClassDescriptionInfo implements ObjectOutputWriteable {
 	}
 
 	@Override
-	public void writeTo(ObjectOutput output) throws IOException {
+	public void writeTo(CachingObjectOutput output) throws IOException {
 		output.writeByte(flags);
 		output.writeShort(fields.length);
 		for(Field field : fields) {

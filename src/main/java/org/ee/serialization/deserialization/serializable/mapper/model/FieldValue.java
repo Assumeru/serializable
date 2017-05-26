@@ -26,7 +26,7 @@ public class FieldValue implements ObjectOutputWriteable {
 	}
 
 	@Override
-	public void writeTo(ObjectOutput output) throws IOException {
+	public void writeTo(CachingObjectOutput output) throws IOException {
 		writeType(output, field.getTypeCode(), value);
 	}
 

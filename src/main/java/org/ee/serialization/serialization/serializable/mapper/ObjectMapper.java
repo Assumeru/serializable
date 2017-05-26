@@ -8,10 +8,10 @@ import org.ee.serialization.deserialization.serializable.mapper.model.ObjectOutp
 import org.ee.serialization.serialization.serializable.output.ObjectOutputSerializer;
 
 public class ObjectMapper implements SerializableMapper {
-	private final ClassMapper mapper;
+	private final ClassDescriptionManager cache;
 
-	public ObjectMapper(ClassMapper mapper) {
-		this.mapper = mapper;
+	public ObjectMapper(ClassDescriptionManager cache) {
+		this.cache = cache;
 	}
 
 	@Override
@@ -25,11 +25,12 @@ public class ObjectMapper implements SerializableMapper {
 			((ObjectOutputWriteable) object).writeTo(output);
 		} else {
 			output.writeByte(ObjectStreamConstants.TC_OBJECT);
-			ClassDescription description = mapper.getClassDescription(object.getClass());
+			ClassDescription description = cache.getClassDescription(object.getClass());
 			output.writeObject(description);
+			output.assignHandle(object);
 			boolean cont = true;
 			while(description != null && cont) {
-				cont = mapper.writeDescription(object, output, description);
+				cont = cache.writeFromDescription(object, output, description);
 				description = description.getInfo().getSuperClass();
 			}
 		}

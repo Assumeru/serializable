@@ -5,23 +5,24 @@ import java.io.ObjectStreamConstants;
 
 import org.ee.serialization.serialization.serializable.output.ObjectOutputSerializer;
 
-public class ClassMapper implements SerializableMapper {
+public class EnumMapper implements SerializableMapper {
 	private final ClassDescriptionManager cache;
 
-	public ClassMapper(ClassDescriptionManager cache) {
+	public EnumMapper(ClassDescriptionManager cache) {
 		this.cache = cache;
 	}
 
 	@Override
 	public boolean canMap(Object object) {
-		return object instanceof Class;
+		return object instanceof Enum;
 	}
 
 	@Override
 	public void map(Object object, ObjectOutputSerializer output) throws IOException {
-		Class<?> type = (Class<?>) object;
-		output.writeByte(ObjectStreamConstants.TC_CLASS);
-		output.writeObject(cache.getClassDescription(type));
-		output.assignHandle(type);
+		Enum<?> value = (Enum<?>) object;
+		output.writeByte(ObjectStreamConstants.TC_ENUM);
+		output.writeObject(cache.getClassDescription(value.getClass()));
+		output.assignHandle(value);
+		output.writeObject(value.name());
 	}
 }

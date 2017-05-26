@@ -11,9 +11,12 @@ public class DefaultMapper extends DelegatingMapper<ObjectOutputSerializer, Seri
 
 	public DefaultMapper() {
 		super(new ArrayList<SerializableMapper>());
-		ClassMapper cache = new ClassMapper();
+		ClassDescriptionManager cache = new ClassDescriptionManager();
 		mappers.add(new PrimitiveMapper());
 		mappers.add(new ReferenceMapper());
+		mappers.add(new EnumMapper(cache));
+		mappers.add(new ArrayMapper(cache));
+		mappers.add(new ClassMapper(cache));
 		mappers.add(new StandardMapper(cache));
 		mappers.add(new ObjectMapper(cache));
 	}

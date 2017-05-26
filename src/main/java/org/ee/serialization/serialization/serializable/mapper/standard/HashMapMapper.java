@@ -2,21 +2,33 @@ package org.ee.serialization.serialization.serializable.mapper.standard;
 
 import java.io.IOException;
 import java.io.ObjectStreamConstants;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.ee.serialization.deserialization.serializable.mapper.model.ClassDescription;
 import org.ee.serialization.serialization.serializable.ObjectOutputStreamSerializer;
-import org.ee.serialization.serialization.serializable.mapper.ClassMapper;
+import org.ee.serialization.serialization.serializable.mapper.ClassDescriptionManager;
 import org.ee.serialization.serialization.serializable.mapper.SerializableMapper;
 import org.ee.serialization.serialization.serializable.output.ObjectOutputSerializer;
-import org.ee.serialization.serialization.serializable.output.StreamBuffer;
 
 public class HashMapMapper implements SerializableMapper {
-	private final ClassMapper mapper;
+	private static final Method CAPACITY;
+	static {
+		Method capacity;
+		try {
+			capacity = HashMap.class.getDeclaredMethod("capacity");
+			capacity.setAccessible(true);
+		} catch (NoSuchMethodException | SecurityException e) {
+			capacity = null;
+		}
+		CAPACITY = capacity;
+	}
+	private final ClassDescriptionManager cache;
 
-	public HashMapMapper(ClassMapper mapper) {
-		this.mapper = mapper;
+	public HashMapMapper(ClassDescriptionManager cache) {
+		this.cache = cache;
 	}
 
 	@Override
@@ -28,22 +40,29 @@ public class HashMapMapper implements SerializableMapper {
 	public void map(Object object, ObjectOutputSerializer output) throws IOException {
 		HashMap<?, ?> map = (HashMap<?, ?>) object;
 		output.writeByte(ObjectStreamConstants.TC_OBJECT);
-		ClassDescription description = mapper.getClassDescription(object.getClass());
+		ClassDescription description = cache.getClassDescription(object.getClass());
 		output.writeObject(description);
+		output.assignHandle(object);
 		boolean cont = true;
 		while(description != null && cont) {
-			cont = mapper.writeDescription(object, output, description);
+			cont = cache.writeFromDescription(object, output, description);
 			description = description.getInfo().getSuperClass();
 		}
-		try(StreamBuffer buffer = output.getStreamBuffer()) {
-			buffer.writeInt(map.size());
-			buffer.writeInt(map.size());
-			for(Map.Entry<?, ?> entry : map.entrySet()) {
-				buffer.writeObject(entry.getKey());
-				buffer.writeObject(entry.getValue());
-			}
-			ObjectOutputStreamSerializer.writeBlockDataHeader(output, buffer.size());
+		ObjectOutputStreamSerializer.writeBlockDataHeader(output, 2 * Integer.SIZE / Byte.SIZE);
+		output.writeInt(getCapacity(map));
+		output.writeInt(map.size());
+		for(Map.Entry<?, ?> entry : map.entrySet()) {
+			output.writeObject(entry.getKey());
+			output.writeObject(entry.getValue());
 		}
 		output.writeByte(ObjectStreamConstants.TC_ENDBLOCKDATA);
+	}
+
+	private int getCapacity(HashMap<?, ?> map) {
+		try {
+			return (Integer) CAPACITY.invoke(map);
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			return map.size();
+		}
 	}
 }
