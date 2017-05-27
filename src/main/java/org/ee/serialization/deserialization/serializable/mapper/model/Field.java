@@ -94,4 +94,15 @@ public abstract class Field implements ObjectOutputWriteable, Comparable<Field> 
 		}
 		return name.compareTo(o.name);
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == this) {
+			return true;
+		} else if(obj instanceof Field) {
+			Field other = (Field) obj;
+			return typeCode == other.typeCode && name.equals(other.name) && description.equals(other.description);
+		}
+		return false;
+	}
 }

@@ -34,4 +34,15 @@ public class EnumMapping extends ObjectMapping {
 		output.assignHandle(this);
 		output.writeObject(name);
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == this) {
+			return true;
+		} else if(obj instanceof EnumMapping) {
+			EnumMapping other = (EnumMapping) obj;
+			return getDescription().equals(other.getDescription()) && name.equals(other.name);
+		}
+		return false;
+	}
 }

@@ -19,7 +19,7 @@ public class SerializableDataOutputStream extends CachingSerializer implements O
 	private final StreamBufferPool pool;
 
 	public SerializableDataOutputStream(OutputStream output, Config config, SerializableMapper mapper, ObjectFilter filter) throws IOException {
-		super(false);
+		super(false, config.get(USE_IDENTITY_COMPARE, true));
 		this.output = output instanceof DataOutputStream ? (DataOutputStream) output : new DataOutputStream(output);
 		this.config = config;
 		this.mapper = mapper;

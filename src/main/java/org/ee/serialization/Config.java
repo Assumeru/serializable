@@ -11,6 +11,14 @@ public class Config {
 		return (E) factorySettings.get(key);
 	}
 
+	public <E> E get(Key<E> key, E fallback) {
+		E out = get(key);
+		if(out == null) {
+			return fallback;
+		}
+		return out;
+	}
+
 	public <E> Config set(Key<E> key, E value) {
 		factorySettings.put(key, value);
 		return this;

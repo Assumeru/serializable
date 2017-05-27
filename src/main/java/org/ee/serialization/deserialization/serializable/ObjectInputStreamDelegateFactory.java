@@ -3,7 +3,6 @@ package org.ee.serialization.deserialization.serializable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectStreamConstants;
-import java.util.Objects;
 
 import org.ee.serialization.Config;
 import org.ee.serialization.Config.Key;
@@ -17,8 +16,7 @@ public class ObjectInputStreamDelegateFactory implements DelegateFactory {
 
 	@Override
 	public DeserializationDelegate createDeserializer(InputStream input, Config config) throws IOException {
-		Boolean useNative = config.get(USE_NATIVE);
-		if(Objects.equals(useNative, Boolean.FALSE)) {
+		if(config.get(USE_NATIVE, true)) {
 			return new ObjectInputStreamMapperDelegate(input, config.get(MAPPER));
 		}
 		return new ObjectInputStreamDelegate(input);

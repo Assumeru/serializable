@@ -2,20 +2,27 @@ package org.ee.serialization.serialization;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 import org.ee.serialization.Serializer;
+import org.ee.serialization.Config.Key;
 
 public abstract class CachingSerializer implements Serializer {
+	public static final Key<Boolean> USE_IDENTITY_COMPARE = new Key<>();
 	private final Map<Object, Reference> references;
 	private final boolean addAutomatically;
 
 	public CachingSerializer() {
-		this(true);
+		this(true, false);
 	}
 
-	public CachingSerializer(boolean addAutomatically) {
-		references = new HashMap<>();
+	public CachingSerializer(boolean addAutomatically, boolean identity) {
+		if(identity) {
+			references = new IdentityHashMap<>();
+		} else {
+			references = new HashMap<>();
+		}
 		this.addAutomatically = addAutomatically;
 	}
 

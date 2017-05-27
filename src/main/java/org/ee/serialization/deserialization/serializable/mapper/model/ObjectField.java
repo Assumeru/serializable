@@ -33,4 +33,14 @@ public class ObjectField extends Field {
 	public String toString() {
 		return className + " " + getName();
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == this) {
+			return true;
+		} else if(obj instanceof ObjectField && super.equals(obj)) {
+			return className.equals(((ObjectField) obj).className);
+		}
+		return false;
+	}
 }

@@ -27,17 +27,9 @@ public class JsonSerializer implements Serializer {
 		}
 		if(writer == null) {
 			writer = new GsonWriter(output);
-			((GsonWriter) writer).setPrettyPrint(getBoolean(config.get(PRETTY_PRINT)));
+			((GsonWriter) writer).setPrettyPrint(config.get(PRETTY_PRINT, false));
 		}
-		JsonMapper mapper = config.get(JSON_MAPPER);
-		if(mapper == null) {
-			mapper = DefaultMapper.INSTANCE;
-		}
-		this.output = new JsonDataOutputStream(writer, config, mapper, config.get(OBJECT_FILTER));
-	}
-
-	private boolean getBoolean(Boolean value) {
-		return value == null ? false : value;
+		this.output = new JsonDataOutputStream(writer, config, config.get(JSON_MAPPER, DefaultMapper.INSTANCE), config.get(OBJECT_FILTER));
 	}
 
 	@Override

@@ -246,4 +246,22 @@ public class ArrayMapping extends ObjectMapping implements List<Object>, RandomA
 			FieldValue.writeType(output, type, value);
 		}
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == this) {
+			return true;
+		} else if(obj instanceof ArrayMapping) {
+			ArrayMapping other = (ArrayMapping) obj;
+			if(getDescription().equals(other.getDescription()) && other.size() == size()) {
+				for(int i = 0; i < size(); i++) {
+					if(!Objects.deepEquals(get(i), other.get(i))) {
+						return false;
+					}
+				}
+				return true;
+			}
+		}
+		return false;
+	}
 }

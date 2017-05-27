@@ -23,6 +23,7 @@ public class JsonDataOutputStream extends CachingSerializer implements JsonWrite
 	private final ObjectFilter filter;
 
 	public JsonDataOutputStream(JsonWriter output, Config config, JsonMapper mapper, ObjectFilter filter) throws IOException {
+		super(true, config.get(USE_IDENTITY_COMPARE, false));
 		this.output = output;
 		this.config = config;
 		this.mapper = mapper;

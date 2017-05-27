@@ -24,15 +24,11 @@ public class ObjectMapper implements JsonMapper {
 			output.value((String) null);
 			return;
 		}
-		Boolean addVersion = output.getConfig().get(ADD_VERSION);
-		if(addVersion == null) {
-			addVersion = false;
-		}
 		try {
 			ClassDescriptor descriptor = getClassDescriptor(object.getClass());
 			output.beginObject();
 			output.name(JsonDataOutputStream.PROPERTY_CLASS).value(descriptor.getName());
-			if(addVersion && descriptor.getSerialVersion() != null) {
+			if(output.getConfig().get(ADD_VERSION, false) && descriptor.getSerialVersion() != null) {
 				output.name(JsonDataOutputStream.PROPERTY_VERSION).value(descriptor.getSerialVersion());
 			}
 			output.name(JsonDataOutputStream.PROPERTY_FIELDS).beginObject();

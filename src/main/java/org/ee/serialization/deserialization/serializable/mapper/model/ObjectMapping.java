@@ -6,8 +6,10 @@ import java.io.ObjectStreamConstants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import org.ee.serialization.SerializationException;
 import org.ee.serialization.deserialization.serializable.ObjectInputStreamMapperDelegate;
@@ -20,6 +22,17 @@ public class ObjectMapping implements JsonSerializable, ObjectOutputWriteable {
 	private final ClassDescription description;
 	private List<FieldValue> fields;
 	private List<Object> data;
+
+	static void writeBlockData(CachingObjectOutput output, List<Object> data) throws IOException {
+		for(Object o : data) {
+			if(o != null && o.getClass() == byte[].class) {
+				ObjectOutputStreamSerializer.writeBlockData(output, (byte[]) o);
+			} else {
+				output.writeObject(o);
+			}
+		}
+		output.writeByte(ObjectStreamConstants.TC_ENDBLOCKDATA);
+	}
 
 	public ObjectMapping(ClassDescription description) {
 		this.description = description;
@@ -124,39 +137,35 @@ public class ObjectMapping implements JsonSerializable, ObjectOutputWriteable {
 	@Override
 	public void writeTo(CachingObjectOutput output) throws IOException {
 		output.writeByte(ObjectStreamConstants.TC_OBJECT);
-		ClassDescription description = this.description;
 		output.writeObject(description);
 		output.assignHandle(this);
-		boolean cont = true;
-		while(description != null && cont) {
-			cont = writeDescription(output, description);
-			description = description.getInfo().getSuperClass();
-		}
-	}
-
-	private boolean writeDescription(CachingObjectOutput output, ClassDescription description) throws IOException {
 		if(description.getInfo().hasFlag(ObjectStreamConstants.SC_EXTERNALIZABLE)) {
 			writeBlockData(output, data);
-			return false;
+			return;
 		}
 		for(FieldValue field : fields) {
 			field.writeTo(output);
 		}
-		//TODO
-		if(this.description == description && description.getInfo().hasFlag(ObjectStreamConstants.SC_WRITE_METHOD)) {
+		if(description.getInfo().hasFlag(ObjectStreamConstants.SC_WRITE_METHOD)) {
 			writeBlockData(output, data);
 		}
-		return true;
 	}
 
-	static void writeBlockData(CachingObjectOutput output, List<Object> data) throws IOException {
-		for(Object o : data) {
-			if(o != null && o.getClass() == byte[].class) {
-				ObjectOutputStreamSerializer.writeBlockData(output, (byte[]) o);
-			} else {
-				output.writeObject(o);
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj) {
+			return true;
+		} else if(obj instanceof ObjectMapping) {
+			ObjectMapping other = (ObjectMapping) obj;
+			if(description.equals(other.description) && fields.equals(other.fields) && data.size() == other.data.size()) {
+				for(Iterator<Object> mine = data.iterator(), theirs = other.data.iterator(); mine.hasNext() && theirs.hasNext();) {
+					if(!Objects.deepEquals(mine.next(), theirs.next())) {
+						return false;
+					}
+				}
+				return true;
 			}
 		}
-		output.writeByte(ObjectStreamConstants.TC_ENDBLOCKDATA);
+		return false;
 	}
 }

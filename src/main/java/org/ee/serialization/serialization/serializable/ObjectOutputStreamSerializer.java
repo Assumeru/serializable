@@ -17,11 +17,7 @@ public class ObjectOutputStreamSerializer implements Serializer {
 	private final SerializableDataOutputStream output;
 
 	public ObjectOutputStreamSerializer(OutputStream output, Config config) throws IOException {
-		SerializableMapper mapper = config.get(SERIALIZABLE_MAPPER);
-		if(mapper == null) {
-			mapper = DefaultMapper.INSTANCE;
-		}
-		this.output = new SerializableDataOutputStream(output, config, mapper, config.get(OBJECT_FILTER));
+		this.output = new SerializableDataOutputStream(output, config, config.get(SERIALIZABLE_MAPPER, DefaultMapper.INSTANCE), config.get(OBJECT_FILTER));
 	}
 
 	@Override
