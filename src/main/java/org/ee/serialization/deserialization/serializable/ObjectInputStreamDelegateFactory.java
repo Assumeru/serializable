@@ -16,7 +16,7 @@ public class ObjectInputStreamDelegateFactory implements DelegateFactory {
 
 	@Override
 	public DeserializationDelegate createDeserializer(InputStream input, Config config) throws IOException {
-		if(config.get(USE_NATIVE, true)) {
+		if(!config.get(USE_NATIVE, true)) {
 			return new ObjectInputStreamMapperDelegate(input, config.get(MAPPER));
 		}
 		return new ObjectInputStreamDelegate(input);

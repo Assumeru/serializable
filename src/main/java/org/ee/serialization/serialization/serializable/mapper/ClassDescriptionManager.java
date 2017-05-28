@@ -22,7 +22,6 @@ import org.ee.serialization.deserialization.serializable.mapper.model.ClassDescr
 import org.ee.serialization.deserialization.serializable.mapper.model.Field;
 import org.ee.serialization.deserialization.serializable.mapper.model.ObjectField;
 import org.ee.serialization.deserialization.serializable.mapper.model.PrimitiveField;
-import org.ee.serialization.serialization.serializable.ObjectOutputStreamSerializer;
 import org.ee.serialization.serialization.serializable.output.ObjectOutputSerializer;
 import org.ee.serialization.serialization.serializable.output.StreamBuffer;
 
@@ -133,9 +132,8 @@ public class ClassDescriptionManager {
 			if(WRITE_EXTERNAL == null) {
 				throw new SerializationException("Could not access Externalizable.writeExternal");
 			}
-			try(StreamBuffer buffer = output.getStreamBuffer()) {
+			try(StreamBuffer buffer = output.getBlockDataBuffer()) {
 				WRITE_EXTERNAL.invoke(object, buffer);
-				ObjectOutputStreamSerializer.writeBlockDataHeader(output, buffer.size());
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				throw new SerializationException(e);
 			}

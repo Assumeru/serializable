@@ -33,8 +33,11 @@ public class StreamBufferPool {
 		return buffer;
 	}
 
+	public OutputStream getOutput() {
+		return output;
+	}
+
 	void returnBuffer(StreamBuffer buffer) throws IOException {
-		buffer.writeTo(output);
 		boolean add = bufferPool.size() < MAX_POOL_SIZE;
 		if(!add) {
 			for(Iterator<WeakReference<StreamBuffer>> it = bufferPool.iterator(); it.hasNext();) {
@@ -46,7 +49,6 @@ public class StreamBufferPool {
 			}
 		}
 		if(add) {
-			buffer.reset();
 			bufferPool.add(new WeakReference<>(buffer));
 		}
 	}

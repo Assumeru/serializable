@@ -30,21 +30,12 @@ public class SerializableDataOutputStream extends CachingSerializer implements O
 	}
 
 	@Override
-	public void writeObject(Object object, ObjectOutputSerializer serializer) throws IOException {
-		writeObjectOrReference(getFromCache(object), serializer);
-	}
-
-	@Override
 	protected void writeObjectOrReference(Object object) throws IOException {
-		writeObjectOrReference(object, this);
-	}
-
-	private void writeObjectOrReference(Object object, ObjectOutputSerializer serializer) throws IOException {
 		if(filter != null) {
 			object = filter.filter(object, config);
 		}
 		if(mapper.canMap(object)) {
-			mapper.map(object, serializer);
+			mapper.map(object, this);
 		} else {
 			throw new SerializationException("Could not map " + object);
 		}
@@ -66,7 +57,7 @@ public class SerializableDataOutputStream extends CachingSerializer implements O
 	}
 
 	@Override
-	public StreamBuffer getStreamBuffer() {
+	public StreamBuffer getBlockDataBuffer() {
 		return pool.getStreamBuffer();
 	}
 
