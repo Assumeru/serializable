@@ -40,6 +40,13 @@ public class ObjectMapping implements JsonSerializable, ObjectOutputWriteable {
 		data = Collections.emptyList();
 	}
 
+	public ObjectMapping(ClassDescription description, List<FieldValue> fields, List<Object> data) {
+		this.description = description;
+		this.fields = new ArrayList<>(fields);
+		Collections.sort(this.fields, new FieldValueComparator(description));
+		this.data = data;
+	}
+
 	public void readClassData(ObjectInputStreamMapperDelegate input) throws IOException {
 		ClassDescriptionInfo info = description.getInfo();
 		if(info.hasFlag(ObjectStreamConstants.SC_EXTERNALIZABLE)) {
