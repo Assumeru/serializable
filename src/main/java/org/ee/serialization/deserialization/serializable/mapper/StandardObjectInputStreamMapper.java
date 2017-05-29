@@ -15,7 +15,7 @@ import org.ee.serialization.deserialization.serializable.mapper.standard.LinkedL
 import org.ee.serialization.deserialization.serializable.mapper.standard.PrimitiveMapper;
 import org.ee.serialization.deserialization.serializable.mapper.standard.SingleClassMapper;
 
-public class StandardObjectInputStreamMapper implements ObjectInputStreamMapperDelegate {
+public class StandardObjectInputStreamMapper extends NonCachingMapper {
 	private static final Set<Class<?>> PRIMITIVES = new HashSet<>(Arrays.asList(Boolean.class, Byte.class, Character.class, Double.class, Float.class, Integer.class, Long.class, Short.class, String.class, Void.class));
 	private static final ObjectInputStreamMapperDelegate PRIMITIVE_MAPPER = new PrimitiveMapper();
 	private static final Map<String, SingleClassMapper<?>> MAPPERS = new HashMap<>();

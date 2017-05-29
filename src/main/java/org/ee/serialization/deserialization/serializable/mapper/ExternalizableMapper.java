@@ -11,7 +11,7 @@ import org.ee.serialization.deserialization.serializable.mapper.model.ClassDescr
 import org.ee.serialization.deserialization.serializable.mapper.model.ClassDescriptionInfo;
 import org.ee.serialization.deserialization.serializable.mapper.model.ObjectMapping;
 
-public class ExternalizableMapper implements ObjectInputStreamMapperDelegate {
+public class ExternalizableMapper extends AbstractMapper {
 	private final Map<ClassDescription, Boolean> mappable;
 
 	public ExternalizableMapper() {
@@ -19,11 +19,12 @@ public class ExternalizableMapper implements ObjectInputStreamMapperDelegate {
 	}
 
 	@Override
-	public Object map(Object object, ObjectInputStreamMapper mapper) throws IOException, ClassNotFoundException {
+	protected Object doMap(Object object, ObjectInputStreamMapper mapper) throws IOException, ClassNotFoundException {
 		if(object instanceof ObjectMapping) {
 			ObjectMapping mapping = (ObjectMapping) object;
 			try {
 				Externalizable out = (Externalizable) SerializableMapper.newInstance(mapping.getDescription(), mappable);
+				mapper.cache(object, out);
 				out.readExternal(mapping.getData(mapper));
 				return out;
 			} catch (ReflectiveOperationException e) {

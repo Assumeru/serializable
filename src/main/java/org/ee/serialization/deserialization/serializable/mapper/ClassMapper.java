@@ -7,7 +7,7 @@ import java.util.WeakHashMap;
 import org.ee.serialization.deserialization.serializable.mapper.model.ClassDescription;
 import org.ee.serialization.deserialization.serializable.mapper.model.ClassMapping;
 
-public class ClassMapper implements ObjectInputStreamMapperDelegate {
+public class ClassMapper extends NonCachingMapper {
 	private final Map<ClassDescription, Boolean> mappable;
 
 	public ClassMapper() {

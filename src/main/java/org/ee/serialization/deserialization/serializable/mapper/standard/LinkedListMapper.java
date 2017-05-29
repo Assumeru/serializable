@@ -19,6 +19,7 @@ public class LinkedListMapper extends AbstractMapper<LinkedList> {
 		ObjectInput input = object.getData(mapper);
 		int size = input.readInt();
 		LinkedList<Object> out = new LinkedList<>();
+		mapper.cache(object, out);
 		try {
 			while(size > 0) {
 				out.add(input.readObject());

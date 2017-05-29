@@ -5,11 +5,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.ee.serialization.deserialization.serializable.mapper.NonCachingMapper;
 import org.ee.serialization.deserialization.serializable.mapper.ObjectInputStreamMapper;
-import org.ee.serialization.deserialization.serializable.mapper.ObjectInputStreamMapperDelegate;
 import org.ee.serialization.deserialization.serializable.mapper.model.ObjectMapping;
 
-public class PrimitiveMapper implements ObjectInputStreamMapperDelegate {
+public class PrimitiveMapper extends NonCachingMapper {
 	private static final Set<String> PRIMITIVE_NAMES = new HashSet<>(Arrays.asList(
 			Boolean.class.getName(), Byte.class.getName(),
 			Character.class.getName(), Double.class.getName(),

@@ -16,7 +16,7 @@ import org.ee.serialization.deserialization.serializable.mapper.platform.JreCons
 import org.ee.serialization.deserialization.serializable.mapper.platform.NativeConstructor;
 import org.ee.serialization.deserialization.serializable.mapper.platform.ReflectionConstuctor;
 
-public class SerializableMapper implements ObjectInputStreamMapperDelegate {
+public class SerializableMapper extends AbstractMapper {
 	private static final int STATIC_FINAL = Modifier.STATIC | Modifier.FINAL;
 	private static final NativeConstructor NATIVE_CONSTRUCTOR;
 	static {
@@ -39,11 +39,12 @@ public class SerializableMapper implements ObjectInputStreamMapperDelegate {
 	}
 
 	@Override
-	public Object map(Object object, ObjectInputStreamMapper mapper) throws IOException, ClassNotFoundException {
+	protected Object doMap(Object object, ObjectInputStreamMapper mapper) throws IOException, ClassNotFoundException {
 		if(object instanceof ObjectMapping) {
 			ObjectMapping mapping = (ObjectMapping) object;
 			try {
 				Object out = newInstance(mapping.getDescription(), mappable);
+				mapper.cache(object, out);
 				for(FieldValue value : mapping.getFields()) {
 					value.getField().getField().set(out, mapper.map(value.getValue(), mapper));
 				}

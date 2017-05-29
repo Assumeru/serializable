@@ -19,6 +19,7 @@ public class HashMapMapper extends AbstractMapper<HashMap> {
 		ObjectInput input = object.getData(mapper);
 		int capacity = input.readInt();
 		HashMap<Object, Object> map = new HashMap<>(capacity);
+		mapper.cache(object, map);
 		int size = input.readInt();
 		try {
 			while(size > 0) {

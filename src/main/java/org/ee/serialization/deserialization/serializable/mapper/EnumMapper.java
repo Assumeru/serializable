@@ -9,7 +9,7 @@ import org.ee.serialization.deserialization.serializable.mapper.model.ClassDescr
 import org.ee.serialization.deserialization.serializable.mapper.model.EnumMapping;
 import org.ee.serialization.deserialization.serializable.mapper.model.ObjectMapping;
 
-public class EnumMapper implements ObjectInputStreamMapperDelegate {
+public class EnumMapper extends NonCachingMapper {
 	private final Map<ClassDescription, Boolean> mappable;
 
 	public EnumMapper() {

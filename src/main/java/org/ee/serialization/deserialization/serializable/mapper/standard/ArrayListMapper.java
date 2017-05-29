@@ -19,6 +19,7 @@ public class ArrayListMapper extends AbstractMapper<ArrayList> {
 		ObjectInput input = object.getData(mapper);
 		int size = (Integer) object.getFields().get(0).getValue();
 		ArrayList<Object> out = new ArrayList<>(Math.max(size, input.readInt()));
+		mapper.cache(object, out);
 		try {
 			while(size > 0) {
 				out.add(input.readObject());

@@ -9,7 +9,7 @@ import org.ee.serialization.deserialization.serializable.mapper.model.ArrayMappi
 import org.ee.serialization.deserialization.serializable.mapper.model.ClassDescription;
 import org.ee.serialization.deserialization.serializable.mapper.model.ObjectMapping;
 
-public class ArrayMapper implements ObjectInputStreamMapperDelegate {
+public class ArrayMapper extends AbstractMapper {
 	private final Map<ClassDescription, Boolean> mappable;
 
 	public ArrayMapper() {
@@ -17,11 +17,12 @@ public class ArrayMapper implements ObjectInputStreamMapperDelegate {
 	}
 
 	@Override
-	public Object map(Object object, ObjectInputStreamMapper mapper) throws IOException, ClassNotFoundException {
+	protected Object doMap(Object object, ObjectInputStreamMapper mapper) throws IOException, ClassNotFoundException {
 		if(object instanceof ArrayMapping) {
 			ArrayMapping mapping = (ArrayMapping) object;
 			Class<?> type = mapping.getDescription().getType();
 			Object out = Array.newInstance(type.getComponentType(), mapping.size());
+			mapper.cache(object, out);
 			for(int i = 0; i < mapping.size(); i++) {
 				Array.set(out, i, mapper.map(mapping.get(i), mapper));
 			}
