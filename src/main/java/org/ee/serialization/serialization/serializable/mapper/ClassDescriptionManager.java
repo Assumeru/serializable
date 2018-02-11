@@ -134,7 +134,9 @@ public class ClassDescriptionManager {
 			}
 			try(StreamBuffer buffer = output.getBlockDataBuffer()) {
 				WRITE_EXTERNAL.invoke(object, buffer);
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			} catch(InvocationTargetException e) {
+				throw new SerializationException("writeExternal threw an exception for " + description, e.getCause());
+			} catch (IllegalAccessException | IllegalArgumentException e) {
 				throw new SerializationException(e);
 			}
 			output.writeByte(ObjectStreamConstants.TC_ENDBLOCKDATA);

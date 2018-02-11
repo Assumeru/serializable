@@ -62,6 +62,7 @@ public class StreamBuffer extends DataOutputStream implements ObjectOutputSerial
 				drain();
 			} else {
 				out.write(b, off, len);
+				written += len;
 				len = 0;
 			}
 		}
