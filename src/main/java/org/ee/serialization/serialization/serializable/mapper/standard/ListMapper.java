@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.ee.serialization.deserialization.serializable.mapper.model.ClassDescription;
 import org.ee.serialization.serialization.serializable.ObjectOutputStreamSerializer;
 import org.ee.serialization.serialization.serializable.mapper.ClassDescriptionManager;
 import org.ee.serialization.serialization.serializable.mapper.SerializableMapper;
@@ -27,15 +26,7 @@ public class ListMapper implements SerializableMapper {
 	@Override
 	public void map(Object object, ObjectOutputSerializer output) throws IOException {
 		List<?> list = (List<?>) object;
-		output.writeByte(ObjectStreamConstants.TC_OBJECT);
-		ClassDescription description = cache.getClassDescription(object.getClass());
-		output.writeObject(description);
-		output.assignHandle(object);
-		boolean cont = true;
-		while(description != null && cont) {
-			cont = cache.writeFromDescription(object, output, description);
-			description = description.getInfo().getSuperClass();
-		}
+		cache.writeFromDescription(object, output);
 		ObjectOutputStreamSerializer.writeBlockDataHeader(output, Integer.SIZE / Byte.SIZE);
 		output.writeInt(list.size());
 		for(Object value : list) {

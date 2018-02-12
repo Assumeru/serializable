@@ -2,11 +2,10 @@ package org.ee.serialization.serialization;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.Map;
 
-import org.ee.serialization.Serializer;
 import org.ee.serialization.Config.Key;
+import org.ee.serialization.Serializer;
 
 public abstract class CachingSerializer implements Serializer {
 	public static final Key<Boolean> USE_IDENTITY_COMPARE = new Key<>();
@@ -19,7 +18,7 @@ public abstract class CachingSerializer implements Serializer {
 
 	public CachingSerializer(boolean addAutomatically, boolean identity) {
 		if(identity) {
-			references = new IdentityHashMap<>();
+			references = new Cache();
 		} else {
 			references = new HashMap<>();
 		}

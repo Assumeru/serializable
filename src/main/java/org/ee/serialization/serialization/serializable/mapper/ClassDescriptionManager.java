@@ -12,7 +12,9 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -127,7 +129,26 @@ public class ClassDescriptionManager {
 		return 0;
 	}
 
-	public boolean writeFromDescription(Object object, ObjectOutputSerializer output, ClassDescription description) throws IOException {
+	public void writeFromDescription(Object object, ObjectOutputSerializer output) throws IOException {
+		output.writeByte(ObjectStreamConstants.TC_OBJECT);
+		ClassDescription description = getClassDescription(object.getClass());
+		output.writeObject(description);
+		output.assignHandle(object);
+		Deque<ClassDescription> stack = new LinkedList<>();
+		while(description != null) {
+			stack.push(description);
+			if(description.getInfo().hasFlag(ObjectStreamConstants.SC_EXTERNALIZABLE)) {
+				break;
+			}
+			description = description.getInfo().getSuperClass();
+		}
+		while(!stack.isEmpty()) {
+			description = stack.pop();
+			writeFromDescription(object, output, description);
+		}
+	}
+
+	private void writeFromDescription(Object object, ObjectOutputSerializer output, ClassDescription description) throws IOException {
 		if(description.getInfo().hasFlag(ObjectStreamConstants.SC_EXTERNALIZABLE)) {
 			if(WRITE_EXTERNAL == null) {
 				throw new SerializationException("Could not access Externalizable.writeExternal");
@@ -140,13 +161,11 @@ public class ClassDescriptionManager {
 				throw new SerializationException(e);
 			}
 			output.writeByte(ObjectStreamConstants.TC_ENDBLOCKDATA);
-			return false;
 		}
 		try {
 			description.getInfo().writeFieldValues(output, object);
 		} catch (NoSuchFieldException | SecurityException | ClassNotFoundException | IllegalAccessException e) {
 			throw new SerializationException(e);
 		}
-		return true;
 	}
 }

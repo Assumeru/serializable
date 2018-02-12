@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ee.serialization.deserialization.serializable.mapper.model.ClassDescription;
 import org.ee.serialization.serialization.serializable.ObjectOutputStreamSerializer;
 import org.ee.serialization.serialization.serializable.mapper.ClassDescriptionManager;
 import org.ee.serialization.serialization.serializable.mapper.SerializableMapper;
@@ -39,15 +38,7 @@ public class HashMapMapper implements SerializableMapper {
 	@Override
 	public void map(Object object, ObjectOutputSerializer output) throws IOException {
 		HashMap<?, ?> map = (HashMap<?, ?>) object;
-		output.writeByte(ObjectStreamConstants.TC_OBJECT);
-		ClassDescription description = cache.getClassDescription(object.getClass());
-		output.writeObject(description);
-		output.assignHandle(object);
-		boolean cont = true;
-		while(description != null && cont) {
-			cont = cache.writeFromDescription(object, output, description);
-			description = description.getInfo().getSuperClass();
-		}
+		cache.writeFromDescription(object, output);
 		ObjectOutputStreamSerializer.writeBlockDataHeader(output, 2 * Integer.SIZE / Byte.SIZE);
 		output.writeInt(getCapacity(map));
 		output.writeInt(map.size());

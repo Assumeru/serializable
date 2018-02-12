@@ -1,9 +1,7 @@
 package org.ee.serialization.serialization.serializable.mapper;
 
 import java.io.IOException;
-import java.io.ObjectStreamConstants;
 
-import org.ee.serialization.deserialization.serializable.mapper.model.ClassDescription;
 import org.ee.serialization.deserialization.serializable.mapper.model.ObjectOutputWriteable;
 import org.ee.serialization.serialization.serializable.output.ObjectOutputSerializer;
 
@@ -24,15 +22,7 @@ public class ObjectMapper implements SerializableMapper {
 		if(object instanceof ObjectOutputWriteable) {
 			((ObjectOutputWriteable) object).writeTo(output);
 		} else {
-			output.writeByte(ObjectStreamConstants.TC_OBJECT);
-			ClassDescription description = cache.getClassDescription(object.getClass());
-			output.writeObject(description);
-			output.assignHandle(object);
-			boolean cont = true;
-			while(description != null && cont) {
-				cont = cache.writeFromDescription(object, output, description);
-				description = description.getInfo().getSuperClass();
-			}
+			cache.writeFromDescription(object, output);
 		}
 	}
 }
