@@ -112,6 +112,14 @@ public class TestStandardLibrary {
 		test(Short.MAX_VALUE);
 	}
 
+
+	@Test
+	public void testIntegerInMap() throws Exception {
+		Map<String, Integer> map = new HashMap<>();
+		map.put("abc", 123);
+		test(map);
+	}
+
 	private void test(Object original) throws IOException, ClassNotFoundException {
 		try(Deserializer d = new Deserializer(write(original), CONFIG)) {
 			Object parsed = d.readObject();

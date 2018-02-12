@@ -99,11 +99,9 @@ public class ClassDescriptionManager {
 				if(fieldType.isPrimitive()) {
 					f = new PrimitiveField(description, Field.getTypeCode(fieldType), field.getName(), field);
 				} else {
-					String fieldDescriptor;
-					if(fieldType.isArray()) {
-						fieldDescriptor = fieldType.getName();
-					} else {
-						fieldDescriptor = new StringBuilder().append('L').append(fieldType.getName().replace('.', '/')).append(';').toString();
+					String fieldDescriptor = fieldType.getName().replace('.', '/');
+					if(!fieldType.isArray()) {
+						fieldDescriptor = new StringBuilder().append('L').append(fieldDescriptor).append(';').toString();
 					}
 					f = new ObjectField(description, Field.getTypeCode(fieldType), field.getName(), fieldDescriptor, field);
 				}

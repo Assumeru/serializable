@@ -42,7 +42,6 @@ public class PrimitiveMapper implements SerializableMapper {
 
 	@Override
 	public boolean canMap(Object object) {
-		return object == null || object.getClass() == String.class || object.getClass() == Boolean.class
-				|| object.getClass() == Character.class || object instanceof Number;
+		return object == null || object.getClass() == String.class;
 	}
 }

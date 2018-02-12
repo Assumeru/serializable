@@ -67,6 +67,6 @@ public class ClassDescription implements ObjectOutputWriteable {
 		output.writeUTF(name);
 		output.writeLong(suid);
 		output.assignHandle(this);
-		getInfo().writeTo(output);
+		info.writeTo(output);
 	}
 }
