@@ -17,6 +17,7 @@ import org.ee.serialization.deserialization.serializable.mapper.ObjectInputStrea
 import org.ee.serialization.serialization.json.JsonSerializable;
 import org.ee.serialization.serialization.json.output.JsonDataOutputStream;
 import org.ee.serialization.serialization.serializable.ObjectOutputStreamSerializer;
+import org.ee.serialization.serialization.serializable.output.CachingObjectOutput;
 
 public class ObjectMapping implements JsonSerializable, ObjectOutputWriteable {
 	private final ClassDescription description;

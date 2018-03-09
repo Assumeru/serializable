@@ -21,7 +21,7 @@ public class ClassMapper implements SerializableMapper {
 	public void map(Object object, ObjectOutputSerializer output) throws IOException {
 		Class<?> type = (Class<?>) object;
 		output.writeByte(ObjectStreamConstants.TC_CLASS);
-		output.writeObject(cache.getClassDescription(type));
+		output.writeObject(cache.getClassDescription(type, false));
 		output.assignHandle(type);
 	}
 }

@@ -1,16 +1,22 @@
 package org.ee.serialization.serialization.serializable.mapper;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamConstants;
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
@@ -44,14 +50,14 @@ public class ClassDescriptionManager {
 		classDescriptions = new HashMap<>();
 	}
 
-	public ClassDescription getClassDescription(Class<?> type) throws SerializationException {
+	public ClassDescription getClassDescription(Class<?> type, boolean sid) throws SerializationException {
 		ClassDescription description = classDescriptions.get(type);
 		if(description == null) {
 			if(Proxy.isProxyClass(type)) {
 				//TODO proxy classes
 				throw new SerializationException("No support for proxy classes: " + type);
 			}
-			description = new ClassDescription(type.getName(), getVersionId(type));
+			description = new ClassDescription(type.getName(), sid ? getVersionId(type) : 0);
 			classDescriptions.put(type, description);
 			byte flags = getFlags(type);
 			Field[] fields = getFields(type, description);
@@ -60,6 +66,10 @@ public class ClassDescriptionManager {
 			description.setInfo(info);
 		}
 		return description;
+	}
+
+	public ClassDescription getClassDescription(Class<?> type) throws SerializationException {
+		return getClassDescription(type, true);
 	}
 
 	private byte getFlags(Class<?> type) throws SerializationException {
@@ -113,18 +123,20 @@ public class ClassDescriptionManager {
 	}
 
 	private long getVersionId(Class<?> type) throws SerializationException {
-		if(Enum.class.isAssignableFrom(type)) {
+		if(Enum.class.isAssignableFrom(type) || Proxy.isProxyClass(type)) {
 			return 0;
 		}
 		try {
-			java.lang.reflect.Field field = type.getDeclaredField("serialVersionUID");
-			field.setAccessible(true);
-			return field.getLong(null);
-		} catch (NoSuchFieldException | NullPointerException e) {
-		} catch (SecurityException | IllegalAccessException e) {
+			try {
+				java.lang.reflect.Field field = type.getDeclaredField("serialVersionUID");
+				field.setAccessible(true);
+				return field.getLong(null);
+			} catch (NoSuchFieldException | NullPointerException e) {
+				return computeVersionId(type);
+			}
+		} catch (SecurityException | IllegalAccessException | IOException | NoSuchAlgorithmException e) {
 			throw new SerializationException(e);
 		}
-		return 0;
 	}
 
 	public void writeFromDescription(Object object, ObjectOutputSerializer output) throws IOException {
@@ -164,6 +176,79 @@ public class ClassDescriptionManager {
 			description.getInfo().writeFieldValues(output, object);
 		} catch (NoSuchFieldException | SecurityException | ClassNotFoundException | IllegalAccessException e) {
 			throw new SerializationException(e);
+		}
+	}
+
+	private long computeVersionId(Class<?> type) throws IOException, NoSuchAlgorithmException {
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		DataOutputStream data = new DataOutputStream(bytes);
+		data.writeUTF(type.getName());
+		data.writeInt(type.getModifiers() & (Modifier.PUBLIC | Modifier.FINAL | Modifier.INTERFACE | Modifier.ABSTRACT));
+		writeInterfaces(type, data);
+		writeFields(type, data);
+		//TODO static initializer
+		writeConstructors(type, data);
+		writeMethods(type, data);
+		MessageDigest md = MessageDigest.getInstance("SHA");
+		byte[] hash = md.digest(bytes.toByteArray());
+		long id = 0;
+		for (int i = Math.min(hash.length, 8) - 1; i >= 0; i--) {
+			id = (id << 8) | (hash[i] & 0xFF);
+		}
+		return id;
+	}
+
+	private void writeInterfaces(Class<?> type, DataOutputStream data) throws IOException {
+		if(!type.isArray()) {
+			Class<?>[] interfaces = type.getInterfaces();
+			String[] names = new String[interfaces.length];
+			for(int i = 0; i < names.length; i++) {
+				names[i] = interfaces[i].getName();
+			}
+			Arrays.sort(names);
+			for(String name : names) {
+				data.writeUTF(name);
+			}
+		}
+	}
+
+	private void writeFields(Class<?> type, DataOutputStream data) throws IOException {
+		List<VersionIdMember> fields = new ArrayList<>();
+		for(java.lang.reflect.Field field : type.getDeclaredFields()) {
+			int modifiers = field.getModifiers();
+			if(!Modifier.isPrivate(modifiers) || (!Modifier.isStatic(modifiers) && !Modifier.isTransient(modifiers))) {
+				fields.add(new VersionIdMember(field));
+			}
+		}
+		Collections.sort(fields);
+		for(VersionIdMember field : fields) {
+			field.writeTo(data);
+		}
+	}
+
+	private void writeConstructors(Class<?> type, DataOutputStream data) throws IOException {
+		List<VersionIdMember> constructors = new ArrayList<>();
+		for(Constructor<?> constructor : type.getDeclaredConstructors()) {
+			if(!Modifier.isPrivate(constructor.getModifiers())) {
+				constructors.add(new VersionIdMember(constructor));
+			}
+		}
+		Collections.sort(constructors);
+		for(VersionIdMember constructor : constructors) {
+			constructor.writeTo(data);
+		}
+	}
+
+	private void writeMethods(Class<?> type, DataOutputStream data) throws IOException {
+		List<VersionIdMember> methods = new ArrayList<>();
+		for(Method method : type.getDeclaredMethods()) {
+			if(!Modifier.isPrivate(method.getModifiers())) {
+				methods.add(new VersionIdMember(method));
+			}
+		}
+		Collections.sort(methods);
+		for(VersionIdMember method : methods) {
+			method.writeTo(data);
 		}
 	}
 }

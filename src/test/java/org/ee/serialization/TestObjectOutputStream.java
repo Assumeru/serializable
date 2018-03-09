@@ -64,6 +64,11 @@ public class TestObjectOutputStream {
 	}
 
 	@Test
+	public void testSid() throws ClassNotFoundException, IOException {
+		test(new Object[] { new SimpleObject[] { o1, o2 } });
+	}
+
+	@Test
 	public void testClass() throws ClassNotFoundException, IOException {
 		Class<?> type = Object.class;
 		test(type);

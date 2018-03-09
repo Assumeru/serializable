@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.ObjectOutput;
 import java.util.Objects;
 
+import org.ee.serialization.serialization.serializable.output.CachingObjectOutput;
+
 public class FieldValue implements ObjectOutputWriteable {
 	private final Field field;
 	private final Object value;

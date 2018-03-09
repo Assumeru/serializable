@@ -3,6 +3,8 @@ package org.ee.serialization.deserialization.serializable.mapper.model;
 import java.io.IOException;
 import java.io.ObjectStreamConstants;
 
+import org.ee.serialization.serialization.serializable.output.CachingObjectOutput;
+
 public class ClassMapping implements ObjectOutputWriteable {
 	private final ClassDescription description;
 

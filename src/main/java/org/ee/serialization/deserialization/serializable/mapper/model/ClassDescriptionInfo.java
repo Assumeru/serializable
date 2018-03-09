@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.ee.serialization.deserialization.serializable.ObjectInputStreamMapperDelegate;
+import org.ee.serialization.serialization.serializable.output.CachingObjectOutput;
 
 public class ClassDescriptionInfo implements ObjectOutputWriteable {
 	private final byte flags;

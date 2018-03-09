@@ -2,6 +2,8 @@ package org.ee.serialization.deserialization.serializable.mapper.model;
 
 import java.io.IOException;
 
+import org.ee.serialization.serialization.serializable.output.CachingObjectOutput;
+
 public abstract class Field implements ObjectOutputWriteable, Comparable<Field> {
 	private static final Field[] NONE = {};
 	private final ClassDescription description;
@@ -34,6 +36,8 @@ public abstract class Field implements ObjectOutputWriteable, Comparable<Field> 
 				return 'J';
 			} else if(type == short.class) {
 				return 'S';
+			} else if(type == void.class) {
+				return 'V';
 			} else {
 				throw new IllegalArgumentException(type + " is not a valid field type");
 			}

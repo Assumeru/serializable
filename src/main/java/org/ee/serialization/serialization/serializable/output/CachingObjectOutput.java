@@ -1,4 +1,4 @@
-package org.ee.serialization.deserialization.serializable.mapper.model;
+package org.ee.serialization.serialization.serializable.output;
 
 import java.io.ObjectOutput;
 

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.ObjectStreamConstants;
 import java.util.Objects;
 
+import org.ee.serialization.serialization.serializable.output.CachingObjectOutput;
+
 public class ClassDescription implements ObjectOutputWriteable {
 	private final String name;
 	private final long suid;

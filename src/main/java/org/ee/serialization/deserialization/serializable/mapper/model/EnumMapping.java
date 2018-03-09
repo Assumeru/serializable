@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectStreamConstants;
 
 import org.ee.serialization.serialization.json.output.JsonDataOutputStream;
+import org.ee.serialization.serialization.serializable.output.CachingObjectOutput;
 
 public class EnumMapping extends ObjectMapping {
 	private final String name;

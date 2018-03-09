@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.RandomAccess;
 
 import org.ee.serialization.serialization.json.output.JsonDataOutputStream;
+import org.ee.serialization.serialization.serializable.output.CachingObjectOutput;
 
 public class ArrayMapping extends ObjectMapping implements List<Object>, RandomAccess {
 	private static final Object[] EMPTY = {};
