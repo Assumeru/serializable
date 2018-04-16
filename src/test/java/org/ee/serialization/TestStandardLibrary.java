@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.ee.serialization.deserialization.serializable.ObjectInputStreamDelegateFactory;
 import org.ee.serialization.deserialization.serializable.mapper.DefaultObjectInputStreamMapper;
@@ -86,6 +88,15 @@ public class TestStandardLibrary {
 		map.put("hello", "world");
 		map.put("age", 123);
 		test(map);
+	}
+
+	@Test
+	public void testHashSet() throws IOException, ClassNotFoundException {
+		Set<Object> set = new HashSet<>();
+		test(set);
+		set.add("hello");
+		set.add("world");
+		test(set);
 	}
 
 	@Test

@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.ee.serialization.objects.ComplexObject;
 import org.ee.serialization.objects.ExternalizableObject;
@@ -51,6 +53,13 @@ public class TestObjectOutputStream {
 		Map<Date, Date> map = new HashMap<>();
 		map.put(date, date);
 		test(map, map);
+	}
+
+	@Test
+	public void testSet() throws ClassNotFoundException, IOException {
+		Set<Date> set = new HashSet<>();
+		set.add(date);
+		test(set, set);
 	}
 
 	@Test

@@ -14,17 +14,22 @@ import org.ee.serialization.serialization.serializable.output.ObjectOutputSerial
 
 public class HashMapMapper implements SerializableMapper {
 	private static final Method CAPACITY;
+	private static final Method LOAD_FACTOR;
 	static {
-		Method capacity;
-		try {
-			capacity = HashMap.class.getDeclaredMethod("capacity");
-			capacity.setAccessible(true);
-		} catch (NoSuchMethodException | SecurityException e) {
-			capacity = null;
-		}
-		CAPACITY = capacity;
+		CAPACITY = getMethod("capacity");
+		LOAD_FACTOR = getMethod("loadFactor");
 	}
 	private final ClassDescriptionManager cache;
+
+	private static Method getMethod(String name) {
+		try {
+			Method capacity = HashMap.class.getDeclaredMethod(name);
+			capacity.setAccessible(true);
+			return capacity;
+		} catch (NoSuchMethodException | SecurityException e) {
+			return null;
+		}
+	}
 
 	public HashMapMapper(ClassDescriptionManager cache) {
 		this.cache = cache;
@@ -49,9 +54,17 @@ public class HashMapMapper implements SerializableMapper {
 		output.writeByte(ObjectStreamConstants.TC_ENDBLOCKDATA);
 	}
 
-	private int getCapacity(HashMap<?, ?> map) {
+	static int getCapacity(HashMap<?, ?> map) {
 		try {
 			return (Integer) CAPACITY.invoke(map);
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			return map.size();
+		}
+	}
+
+	static float getLoadFactor(HashMap<?, ?> map) {
+		try {
+			return (Float) LOAD_FACTOR.invoke(map);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			return map.size();
 		}

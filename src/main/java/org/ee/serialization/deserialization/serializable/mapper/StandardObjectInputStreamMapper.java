@@ -11,6 +11,7 @@ import org.ee.serialization.deserialization.serializable.mapper.model.ObjectMapp
 import org.ee.serialization.deserialization.serializable.mapper.standard.ArrayListMapper;
 import org.ee.serialization.deserialization.serializable.mapper.standard.DateMapper;
 import org.ee.serialization.deserialization.serializable.mapper.standard.HashMapMapper;
+import org.ee.serialization.deserialization.serializable.mapper.standard.HashSetMapper;
 import org.ee.serialization.deserialization.serializable.mapper.standard.LinkedListMapper;
 import org.ee.serialization.deserialization.serializable.mapper.standard.PrimitiveMapper;
 import org.ee.serialization.deserialization.serializable.mapper.standard.SingleClassMapper;
@@ -24,6 +25,7 @@ public class StandardObjectInputStreamMapper extends NonCachingMapper {
 		add(new DateMapper());
 		add(new HashMapMapper());
 		add(new LinkedListMapper());
+		add(new HashSetMapper());
 	}
 
 	private static void add(SingleClassMapper<?> mapper) {

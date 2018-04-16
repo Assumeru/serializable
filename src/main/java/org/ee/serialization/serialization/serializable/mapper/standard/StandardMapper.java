@@ -9,6 +9,6 @@ import org.ee.serialization.serialization.serializable.output.ObjectOutputSerial
 
 public class StandardMapper extends DelegatingMapper<ObjectOutputSerializer, SerializableMapper> implements SerializableMapper {
 	public StandardMapper(ClassDescriptionManager cache) {
-		super(Arrays.asList(new DateMapper(cache), new ListMapper(cache), new HashMapMapper(cache)));
+		super(Arrays.asList(new DateMapper(cache), new ListMapper(cache), new HashMapMapper(cache), new HashSetMapper(cache)));
 	}
 }
